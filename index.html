@@ -130,6 +130,10 @@
   .uni-item .name { font-weight: bold; }
   .uni-item .last { font-size: 11px; opacity: 0.8; }
   .uni-type { font-size: 10px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 5px; margin-right: 5px; color: #fff;}
+  .major-separator {
+    margin-top: 25px; margin-bottom: 10px; border-bottom: 2px dashed rgba(0, 210, 255, 0.4);
+    padding-bottom: 5px; text-align: center; font-weight: bold; color: #00d2ff; font-size: 16px;
+  }
   .channel {
     text-align: center; margin-top: 25px; padding-top: 15px;
     border-top: 1px dashed rgba(255,255,255,0.2); font-size: 13px;
@@ -148,6 +152,7 @@
       <option value="3">منطقه ۳</option>
     </select>
     <select id="majorSelect" onchange="clearResults()">
+      <option value="all">🌟 مشاهده همه رشته‌ها</option>
       <option value="medicine">پزشکی</option>
       <option value="dental">دندان‌پزشکی</option>
       <option value="pharmacy">داروسازی</option>
@@ -208,6 +213,7 @@ var unisData = {
       {name: 'پزشکی زنجان', last: 1560, type: 'روزانه'}, {name: 'پزشکی ارومیه', last: 1821, type: 'روزانه'},
       {name: 'پزشکی اراک', last: 2411, type: 'روزانه'}, {name: 'پزشکی قزوین', last: 2854, type: 'روزانه'},
       {name: 'پزشکی سمنان', last: 3420, type: 'روزانه'}, {name: 'پزشکی شهرکرد', last: 3845, type: 'روزانه'},
+      {name: 'پزشکی تهران', last: 5000, type: 'پردیس'}, {name: 'پزشکی شهید بهشتی', last: 5500, type: 'پردیس'},
       {name: 'پزشکی ایرانشهر', last: 6842, type: 'تعهدی'}, {name: 'پزشکی زاهدان', last: 7350, type: 'تعهدی'}
     ],
     dental: [
@@ -274,11 +280,11 @@ var unisData = {
   }
 };
 
-// 🔴 جداول تبدیل تراز به رتبه (کاملاً مرتب‌شده و شامل تمام داده‌های جدید و قبلی)
+// 🔴 جداول تبدیل تراز به رتبه (مرتب‌شده دقیق از بالا به پایین)
 var tarazRankTable = {
   "1": [
-    [11021, 56], [10705, 158], [10415, 315], [10250, 468], [10188, 533], 
-    [10193, 500], [10110, 411], [10051, 716], [9959, 872], [9879, 1023], 
+    [11021, 56], [10705, 158], [10415, 315], [10250, 468], [10193, 500], 
+    [10188, 533], [10110, 411], [10051, 716], [9959, 872], [9879, 1023], 
     [9832, 640], [9828, 1131], [9798, 1182], [9737, 808], [9688, 1465], 
     [9686, 1472], [9683, 1481], [9658, 991], [9653, 1007], [9631, 1060], 
     [9605, 1131], [9572, 1241], [9524, 1383], [9454, 1587], [9451, 1603], 
@@ -296,7 +302,6 @@ var tarazRankTable = {
     [8564, 7021], [8530, 7314], [8276, 9800], [7871, 14497]
   ]
 };
-// نکته: چون ترازها و رتبه‌ها کمی نویز دارن، من تمام اعداد رو به صورت نزولی مرتب کردم.
 
 function clearResults() {
   document.getElementById('res').style.display = 'none';
@@ -389,24 +394,6 @@ function showResult(taraz, rank, region) {
   document.getElementById('outRank').innerText = rank ? rank.toLocaleString('fa-IR') : '-';
 
   var major = document.getElementById('majorSelect').value;
-  var data = unisData[region][major];
-  
-  var yesList = [], maybeList = [];
-
-  for(var u=0; u<data.length; u++){
-    var diff = data[u].last - rank;
-    var item = data[u];
-    
-    var yesThreshold = (region === "3" || major !== 'medicine') ? 80 : 50;
-    var maybeThreshold = (region === "3" || major !== 'medicine') ? -120 : -100;
-
-    if(diff >= yesThreshold) {
-      yesList.push(item);
-    } else if(diff >= maybeThreshold && diff < yesThreshold) {
-      maybeList.push(item);
-    }
-  }
-
   var resDiv = document.getElementById('uniResults');
   resDiv.innerHTML = '';
 
@@ -414,29 +401,88 @@ function showResult(taraz, rank, region) {
     medicine: 'پزشکی', dental: 'دندان‌پزشکی', pharmacy: 'داروسازی', physio: 'فیزیوتراپی', optometry: 'بینایی‌سنجی'
   };
 
-  var yesHtml = '<h3>✅ ' + majorNames[major] + ' - شانس بالا</h3>';
-  if(yesList.length === 0){
-    yesHtml += '<div style="text-align:center;color:#aaa;font-size:12px;margin-bottom:10px;">دانشگاهی پیدا نشد.</div>';
-  } else {
-    for(var i=0; i<yesList.length; i++){
-      yesHtml += '<div class="uni-item uni-yes">' +
-                 '<span class="name">' + yesList[i].name + ' <span class="uni-type">' + yesList[i].type + '</span></span>' +
-                 '<span class="last">آخرین: ' + yesList[i].last.toLocaleString('fa-IR') + '</span></div>';
+  if(major === 'all') {
+    var majorsList = ['medicine', 'dental', 'pharmacy', 'physio', 'optometry'];
+    for(var m=0; m<majorsList.length; m++) {
+      var currentMajor = majorsList[m];
+      var data = unisData[region][currentMajor];
+      
+      var yesList = [], maybeList = [];
+      for(var u=0; u<data.length; u++){
+        var diff = data[u].last - rank;
+        var item = data[u];
+        var yesThreshold = (region === "3" || currentMajor !== 'medicine') ? 80 : 50;
+        var maybeThreshold = (region === "3" || currentMajor !== 'medicine') ? -120 : -100;
+
+        if(diff >= yesThreshold) yesList.push(item);
+        else if(diff >= maybeThreshold && diff < yesThreshold) maybeList.push(item);
+      }
+
+      if(yesList.length === 0 && maybeList.length === 0) continue;
+
+      resDiv.innerHTML += '<div class="major-separator">' + majorNames[currentMajor] + '</div>';
+
+      if(yesList.length > 0) {
+        resDiv.innerHTML += '<h3>✅ شانس بالا</h3>';
+        for(var i=0; i<yesList.length; i++){
+          resDiv.innerHTML += '<div class="uni-item uni-yes">' +
+            '<span class="name">' + yesList[i].name + ' <span class="uni-type">' + yesList[i].type + '</span></span>' +
+            '<span class="last">آخرین: ' + yesList[i].last.toLocaleString('fa-IR') + '</span></div>';
+        }
+      }
+      
+      if(maybeList.length > 0) {
+        resDiv.innerHTML += '<h3 style="margin-top:15px;">⚠️ شانس کم / مرز</h3>';
+        for(var j=0; j<maybeList.length; j++){
+          resDiv.innerHTML += '<div class="uni-item uni-maybe">' +
+            '<span class="name">' + maybeList[j].name + ' <span class="uni-type">' + maybeList[j].type + '</span></span>' +
+            '<span class="last">آخرین: ' + maybeList[j].last.toLocaleString('fa-IR') + '</span></div>';
+        }
+      }
     }
-  }
-  
-  var maybeHtml = '<h3 style="margin-top:15px;">⚠️ ' + majorNames[major] + ' - شانس کم / مرز</h3>';
-  if(maybeList.length === 0){
-    maybeHtml += '<div style="text-align:center;color:#aaa;font-size:12px;">دانشگاهی پیدا نشد.</div>';
-  } else {
-    for(var j=0; j<maybeList.length; j++){
-      maybeHtml += '<div class="uni-item uni-maybe">' +
-                   '<span class="name">' + maybeList[j].name + ' <span class="uni-type">' + maybeList[j].type + '</span></span>' +
-                   '<span class="last">آخرین: ' + maybeList[j].last.toLocaleString('fa-IR') + '</span></div>';
+    
+    if(resDiv.innerHTML === '') {
+      resDiv.innerHTML = '<div style="text-align:center;color:#aaa;font-size:13px;padding:20px;">با این رتبه، در هیچ‌کدام از رشته‌ها شانس قبولی نداری.</div>';
     }
+
+  } else {
+    var data = unisData[region][major];
+    var yesList = [], maybeList = [];
+
+    for(var u=0; u<data.length; u++){
+      var diff = data[u].last - rank;
+      var item = data[u];
+      var yesThreshold = (region === "3" || major !== 'medicine') ? 80 : 50;
+      var maybeThreshold = (region === "3" || major !== 'medicine') ? -120 : -100;
+
+      if(diff >= yesThreshold) yesList.push(item);
+      else if(diff >= maybeThreshold && diff < yesThreshold) maybeList.push(item);
+    }
+
+    var yesHtml = '<h3>✅ ' + majorNames[major] + ' - شانس بالا</h3>';
+    if(yesList.length === 0){
+      yesHtml += '<div style="text-align:center;color:#aaa;font-size:12px;margin-bottom:10px;">دانشگاهی پیدا نشد.</div>';
+    } else {
+      for(var i=0; i<yesList.length; i++){
+        yesHtml += '<div class="uni-item uni-yes">' +
+                   '<span class="name">' + yesList[i].name + ' <span class="uni-type">' + yesList[i].type + '</span></span>' +
+                   '<span class="last">آخرین: ' + yesList[i].last.toLocaleString('fa-IR') + '</span></div>';
+      }
+    }
+    
+    var maybeHtml = '<h3 style="margin-top:15px;">⚠️ ' + majorNames[major] + ' - شانس کم / مرز</h3>';
+    if(maybeList.length === 0){
+      maybeHtml += '<div style="text-align:center;color:#aaa;font-size:12px;">دانشگاهی پیدا نشد.</div>';
+    } else {
+      for(var j=0; j<maybeList.length; j++){
+        maybeHtml += '<div class="uni-item uni-maybe">' +
+                     '<span class="name">' + maybeList[j].name + ' <span class="uni-type">' + maybeList[j].type + '</span></span>' +
+                     '<span class="last">آخرین: ' + maybeList[j].last.toLocaleString('fa-IR') + '</span></div>';
+      }
+    }
+    resDiv.innerHTML = yesHtml + maybeHtml;
   }
 
-  resDiv.innerHTML = yesHtml + maybeHtml;
   document.getElementById('res').style.display = 'block';
 }
 </script>
