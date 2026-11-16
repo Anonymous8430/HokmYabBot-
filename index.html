@@ -124,7 +124,7 @@
 </script>
 
 <script>
-// 🔴 دیتابیس فشرده و کامل (شامل تمام رشته‌ها و دانشگاه‌های استخراج‌شده از فایل ۴۰۴)
+// 🔴 دیتابیس دانشگاه‌ها (برای اضافه کردن دانشگاه جدید، الگوی زیر را کپی کنید)
 var unisData = {
   "1": {
     medicine: [
@@ -371,11 +371,18 @@ function switchMode(mode) {
   else { document.getElementById('percentForm').style.display = 'block'; document.getElementById('directForm').style.display = 'none'; }
 }
 
+// 🔴 تابع محاسبه تراز از درصد (آپدیت شده با ۱۵ داده جدید)
 function calcPercent(){
   var region = document.getElementById('regionSelect').value;
-  var w = [2.6, 1.5, 1.9, 1.5]; var sumW = 0;
+  
+  // ضرایب و میانگین‌های بهینه‌شده با داده‌های جدید
+  var w = [2.8, 1.8, 2.1, 1.7]; 
+  var sumW = 0;
   for(var j=0;j<4;j++) sumW += w[j];
-  var avgs = [50, 55, 45, 40]; var baseTaraz = 9650; var K = 95;
+  var avgs = [48, 48, 40, 32]; 
+  var baseTaraz = 9800; 
+  var K = 90;
+
   var wp = 0, wa = 0;
   for(var i=0;i<4;i++){
     var v = parseFloat(document.getElementById('d'+(i+1)).value);
@@ -384,6 +391,7 @@ function calcPercent(){
   }
   wp /= sumW; wa /= sumW;
   var taraz = baseTaraz + (wp - wa) * K;
+  
   var rank = getRankFromTaraz(taraz, region);
   showResult(taraz, rank, region);
 }
