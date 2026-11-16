@@ -48,8 +48,18 @@
     text-align: center;
     color: rgba(255,255,255,0.6);
     font-size: 12px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
   }
+  
+  /* استایل جستجو */
+  .search-box {
+    width: 100%; padding: 12px; margin-bottom: 15px;
+    border: 1px solid rgba(255,255,255,0.3); border-radius: 12px;
+    font-size: 14px; background: rgba(0,0,0,0.2); color: #fff; outline: none;
+  }
+  .search-box::placeholder { color: rgba(255,255,255,0.5); }
+  .search-box:focus { border-color: #00d2ff; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); }
+
   .selector-row {
     display: flex; gap: 10px; margin-bottom: 20px;
   }
@@ -106,6 +116,7 @@
     border: 1px solid rgba(0, 210, 255, 0.3);
     border-radius: 16px; display: none;
     animation: slideUp 0.5s ease forwards;
+    max-height: 500px; overflow-y: auto;
   }
   .result .item { margin: 10px 0; font-size: 15px; text-align: center; }
   .result .big { font-size: 36px; font-weight: bold; color: #00d2ff; text-shadow: 0 0 20px rgba(0,210,255,0.5); }
@@ -146,6 +157,9 @@
   <h1>🧮 تراز، رتبه و دانشگاه‌ها</h1>
   <div class="sub">آخرین رتبه‌های ۴۰۴ (تفکیک نوع پذیرش)</div>
 
+  <!-- کادر جستجو -->
+  <input type="text" id="searchInput" class="search-box" placeholder="🔍 جستجوی نام دانشگاه یا شهر (مثلاً گرگان یا جندی)..." onkeyup="searchUniversities()">
+
   <div class="selector-row">
     <select id="regionSelect" onchange="clearResults()">
       <option value="1">منطقه ۱</option>
@@ -184,9 +198,12 @@
   </div>
 
   <div class="result" id="res">
-    <div class="item">تراز تخمینی/واقعی: <span class="big" id="outTaraz">0</span></div>
-    <div class="item">رتبه تخمینی: <span class="rank" id="outRank">-</span></div>
-    <div class="unis" id="uniResults"></div>
+    <div id="searchResultsContainer"></div>
+    <div id="calcResultsContainer">
+      <div class="item">تراز تخمینی/واقعی: <span class="big" id="outTaraz">0</span></div>
+      <div class="item">رتبه تخمینی: <span class="rank" id="outRank">-</span></div>
+      <div class="unis" id="uniResults"></div>
+    </div>
   </div>
 
   <div class="channel">📢 <a href="https://t.me/Hokm_Akhar" target="_blank">@Hokm_Akhar حکم آخر</a></div>
@@ -202,6 +219,7 @@
 
 <!-- 👇 کدهای اصلی برنامه 👇 -->
 <script>
+// 🔴 دیتابیس دانشگاه‌ها (دقیقاً بر اساس فایل ۴۰۴)
 var unisData = {
   "1": {
     medicine: [
@@ -213,7 +231,6 @@ var unisData = {
       {name: 'پزشکی زنجان', last: 1560, type: 'روزانه'}, {name: 'پزشکی ارومیه', last: 1821, type: 'روزانه'},
       {name: 'پزشکی اراک', last: 2411, type: 'روزانه'}, {name: 'پزشکی قزوین', last: 2854, type: 'روزانه'},
       {name: 'پزشکی سمنان', last: 3420, type: 'روزانه'}, {name: 'پزشکی شهرکرد', last: 3845, type: 'روزانه'},
-      {name: 'پزشکی تهران', last: 5000, type: 'پردیس'}, {name: 'پزشکی شهید بهشتی', last: 5500, type: 'پردیس'},
       {name: 'پزشکی ایرانشهر', last: 6842, type: 'تعهدی'}, {name: 'پزشکی زاهدان', last: 7350, type: 'تعهدی'}
     ],
     dental: [
@@ -303,8 +320,60 @@ var tarazRankTable = {
   ]
 };
 
+var majorNames = {
+  medicine: 'پزشکی', dental: 'دندان‌پزشکی', pharmacy: 'داروسازی', physio: 'فیزیوتراپی', optometry: 'بینایی‌سنجی'
+};
+
+// تابع جستجو
+function searchUniversities() {
+  var query = document.getElementById('searchInput').value.trim().toLowerCase();
+  var region = document.getElementById('regionSelect').value;
+  var searchContainer = document.getElementById('searchResultsContainer');
+  var calcContainer = document.getElementById('calcResultsContainer');
+  var resBox = document.getElementById('res');
+
+  if(query === "") {
+    searchContainer.innerHTML = '';
+    calcContainer.style.display = 'block';
+    resBox.style.display = 'none';
+    return;
+  }
+
+  calcContainer.style.display = 'none';
+  searchContainer.innerHTML = '';
+  resBox.style.display = 'block';
+
+  var found = false;
+  var majorsList = ['medicine', 'dental', 'pharmacy', 'physio', 'optometry'];
+
+  majorsList.forEach(function(major) {
+    var data = unisData[region][major];
+    var matches = data.filter(function(uni) {
+      return uni.name.toLowerCase().includes(query);
+    });
+
+    if(matches.length > 0) {
+      found = true;
+      searchContainer.innerHTML += '<div class="major-separator">' + majorNames[major] + '</div>';
+      searchContainer.innerHTML += '<div class="unis">';
+      matches.forEach(function(uni) {
+        searchContainer.innerHTML += '<div class="uni-item uni-yes">' +
+          '<span class="name">' + uni.name + ' <span class="uni-type">' + uni.type + '</span></span>' +
+          '<span class="last">آخرین: ' + uni.last.toLocaleString('fa-IR') + '</span></div>';
+      });
+      searchContainer.innerHTML += '</div>';
+    }
+  });
+
+  if(!found) {
+    searchContainer.innerHTML = '<div style="text-align:center;color:#aaa;font-size:14px;padding:20px;">دانشگاهی با این نام پیدا نشد.</div>';
+  }
+}
+
 function clearResults() {
   document.getElementById('res').style.display = 'none';
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchResultsContainer').innerHTML = '';
 }
 
 function switchMode(mode) {
@@ -390,16 +459,16 @@ function getTarazFromRank(rank, region) {
 }
 
 function showResult(taraz, rank, region) {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchResultsContainer').innerHTML = '';
+  document.getElementById('calcResultsContainer').style.display = 'block';
+
   document.getElementById('outTaraz').innerText = Math.round(taraz).toLocaleString('fa-IR');
   document.getElementById('outRank').innerText = rank ? rank.toLocaleString('fa-IR') : '-';
 
   var major = document.getElementById('majorSelect').value;
   var resDiv = document.getElementById('uniResults');
   resDiv.innerHTML = '';
-
-  var majorNames = {
-    medicine: 'پزشکی', dental: 'دندان‌پزشکی', pharmacy: 'داروسازی', physio: 'فیزیوتراپی', optometry: 'بینایی‌سنجی'
-  };
 
   if(major === 'all') {
     var majorsList = ['medicine', 'dental', 'pharmacy', 'physio', 'optometry'];
