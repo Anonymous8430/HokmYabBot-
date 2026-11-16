@@ -34,8 +34,22 @@
     text-align: center;
     color: #888;
     font-size: 12px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
   }
+  
+  .region-select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 2px solid #2a5298;
+    border-radius: 10px;
+    font-family: Tahoma;
+    font-size: 14px;
+    text-align: center;
+    background: #f0f4f8;
+    outline: none;
+  }
+
   .row {
     display: flex;
     align-items: center;
@@ -68,7 +82,6 @@
     padding: 10px;
     font-size: 14px;
   }
-  .switch-btn:hover { background: #e8eef7; }
 
   #directForm { display: none; }
   .radio-group {
@@ -117,7 +130,13 @@
 <body>
 <div class="box">
   <h1>🧮 تراز، رتبه و دانشگاه‌ها</h1>
-  <div class="sub">منطقه ۱ تجربی - آخرین رتبه‌های ۴۰۴</div>
+  <div class="sub">آخرین رتبه‌های ۴۰۴</div>
+
+  <!-- انتخاب منطقه -->
+  <select id="regionSelect" class="region-select" onchange="clearResults()">
+    <option value="1">منطقه ۱</option>
+    <option value="3">منطقه ۳</option>
+  </select>
 
   <div id="percentForm">
     <div class="row"><label>زیست‌شناسی</label><span class="coef">۱۲</span><input id="d1" type="number" placeholder="%"></div>
@@ -143,7 +162,7 @@
 
   <div class="result" id="res">
     <div class="item">تراز تخمینی/واقعی: <span class="big" id="outTaraz">0</span></div>
-    <div class="item">رتبه منطقه ۱: <span class="rank" id="outRank">-</span></div>
+    <div class="item">رتبه تخمینی: <span class="rank" id="outRank">-</span></div>
 
     <div class="unis">
       <h3>✅ دانشگاه‌هایی که شانس قبولی داری</h3>
@@ -167,41 +186,70 @@
 
 <!-- 👇 کدهای اصلی برنامه 👇 -->
 <script>
-// دیتابیس دانشگاه‌ها (منطقه ۱ - ۴۰۴)
-var medicalUnis = [
-    {name: 'پزشکی تهران', last: 51},
-    {name: 'پزشکی شهید بهشتی', last: 200},
-    {name: 'پزشکی مشهد', last: 248},
-    {name: 'پزشکی شیراز', last: 281},
-    {name: 'پزشکی ایران', last: 358},
-    {name: 'پزشکی تبریز', last: 491},
-    {name: 'پزشکی اصفهان', last: 582},
-    {name: 'پزشکی بابل', last: 732},
-    {name: 'پزشکی کرمانشاه', last: 918},
-    {name: 'پزشکی اهواز', last: 1121},
-    {name: 'پزشکی زنجان', last: 1560},
-    {name: 'پزشکی ارومیه', last: 1821},
-    {name: 'پزشکی اراک', last: 2411},
-    {name: 'پزشکی قزوین', last: 2854},
-    {name: 'پزشکی سمنان', last: 3420},
-    {name: 'پزشکی شهرکرد', last: 3845}
-];
+// دیتابیس دانشگاه‌ها
+var unisData = {
+  "1": {
+    medical: [
+      {name: 'پزشکی تهران', last: 51}, {name: 'پزشکی شهید بهشتی', last: 200},
+      {name: 'پزشکی مشهد', last: 248}, {name: 'پزشکی شیراز', last: 281},
+      {name: 'پزشکی ایران', last: 358}, {name: 'پزشکی تبریز', last: 491},
+      {name: 'پزشکی اصفهان', last: 582}, {name: 'پزشکی بابل', last: 732},
+      {name: 'پزشکی کرمانشاه', last: 918}, {name: 'پزشکی اهواز', last: 1121},
+      {name: 'پزشکی زنجان', last: 1560}, {name: 'پزشکی ارومیه', last: 1821},
+      {name: 'پزشکی اراک', last: 2411}, {name: 'پزشکی قزوین', last: 2854},
+      {name: 'پزشکی سمنان', last: 3420}, {name: 'پزشکی شهرکرد', last: 3845}
+    ],
+    dental: [
+      {name: 'دندان‌پزشکی تهران', last: 66}, {name: 'دندان‌پزشکی شهید بهشتی', last: 95},
+      {name: 'دندان‌پزشکی مشهد', last: 171}, {name: 'دندان‌پزشکی شیراز', last: 232},
+      {name: 'دندان‌پزشکی اصفهان', last: 321}, {name: 'دندان‌پزشکی تبریز', last: 409},
+      {name: 'دندان‌پزشکی بابل', last: 625}, {name: 'دندان‌پزشکی کرمان', last: 812},
+      {name: 'دندان‌پزشکی اهواز', last: 1105}, {name: 'دندان‌پزشکی یزد', last: 1543}
+    ]
+  },
+  "3": {
+    medical: [
+      {name: 'پزشکی تهران', last: 101}, {name: 'پزشکی شهید بهشتی', last: 344},
+      {name: 'پزشکی مشهد', last: 532}, {name: 'پزشکی شیراز', last: 633},
+      {name: 'پزشکی ایران', last: 702}, {name: 'پزشکی تبریز', last: 1035},
+      {name: 'پزشکی اصفهان', last: 1344}, {name: 'پزشکی بابل', last: 1655},
+      {name: 'پزشکی کرمانشاه', last: 1850}, {name: 'پزشکی اهواز', last: 2010},
+      {name: 'پزشکی زنجان', last: 2500}, {name: 'پزشکی ارومیه', last: 2800},
+      {name: 'پزشکی اراک', last: 3100}, {name: 'پزشکی قزوین', last: 3400},
+      {name: 'پزشکی سمنان', last: 3800}, {name: 'پزشکی شهرکرد', last: 4200}
+    ],
+    dental: [
+      {name: 'دندان‌پزشکی تهران', last: 150}, {name: 'دندان‌پزشکی شهید بهشتی', last: 210},
+      {name: 'دندان‌پزشکی مشهد', last: 400}, {name: 'دندان‌پزشکی شیراز', last: 550},
+      {name: 'دندان‌پزشکی اصفهان', last: 700}, {name: 'دندان‌پزشکی تبریز', last: 900},
+      {name: 'دندان‌پزشکی بابل', last: 1300}, {name: 'دندان‌پزشکی کرمان', last: 1700},
+      {name: 'دندان‌پزشکی اهواز', last: 2000}, {name: 'دندان‌پزشکی یزد', last: 2400}
+    ]
+  }
+};
 
-var dentalUnis = [
-    {name: 'دندان‌پزشکی تهران', last: 66},
-    {name: 'دندان‌پزشکی شهید بهشتی', last: 95},
-    {name: 'دندان‌پزشکی مشهد', last: 171},
-    {name: 'دندان‌پزشکی شیراز', last: 232},
-    {name: 'دندان‌پزشکی اصفهان', last: 321},
-    {name: 'دندان‌پزشکی تبریز', last: 409},
-    {name: 'دندان‌پزشکی بابل', last: 625},
-    {name: 'دندان‌پزشکی کرمان', last: 812},
-    {name: 'دندان‌پزشکی اهواز', last: 1105},
-    {name: 'دندان‌پزشکی یزد', last: 1543}
-];
+// جداول تبدیل تراز به رتبه (مرتب‌شده از تراز بالا به پایین)
+var tarazRankTable = {
+  "1": [
+    [11511, 10], [10800, 112], [10200, 500], [10050, 716],
+    [9900, 1000], [9650, 1500], [9500, 2000], [9350, 2500]
+  ],
+  "3": [
+    [10629, 60], [10560, 81], [10193, 239], [10110, 411], [10030, 387], 
+    [9832, 640], [9790, 697], [9737, 808], [9658, 991], [9653, 1007], 
+    [9631, 1060], [9605, 1131], [9572, 1241], [9524, 1383], [9454, 1587], 
+    [9451, 1603], [9414, 1746], [9361, 1963], [9356, 1986], [9328, 2095], 
+    [9279, 2296], [9274, 2320], [9207, 2638], [9070, 3322], [8696, 5906], 
+    [8564, 7021], [8530, 7314], [8276, 9800], [7871, 14497]
+  ]
+};
+
+function clearResults() {
+  document.getElementById('res').style.display = 'none';
+}
 
 function switchMode(mode) {
-  document.getElementById('res').style.display = 'none';
+  clearResults();
   if(mode === 'direct') {
     document.getElementById('percentForm').style.display = 'none';
     document.getElementById('directForm').style.display = 'block';
@@ -211,12 +259,15 @@ function switchMode(mode) {
   }
 }
 
+// ۱. محاسبه تراز از درصد
 function calcPercent(){
-  // وزن‌های تنظیم‌شده دقیق بر اساس ضرایب جدید (ریاضی ۷)
+  var region = document.getElementById('regionSelect').value;
+  
+  // فرمول تبدیل درصد به تراز (ثابت برای کل کشور)
   var w = [2.6, 1.5, 1.9, 1.5]; 
   var sumW = 0;
   for(var j=0;j<4;j++) sumW += w[j];
-  var avgs = [50, 55, 45, 40]; // میانگین‌های تنظیم‌شده
+  var avgs = [50, 55, 45, 40];
   var baseTaraz = 9650;
   var K = 95;
 
@@ -228,13 +279,18 @@ function calcPercent(){
     wa += avgs[i] * w[i];
   }
   wp /= sumW; wa /= sumW;
+  
+  // اینجا تراز به دست میاد
   var taraz = baseTaraz + (wp - wa) * K;
 
-  var rank = tarazToRank(taraz);
-  showResult(taraz, rank);
+  // حالا تراز رو میدیم به تابع تبدیل به رتبه (بر اساس منطقه)
+  var rank = getRankFromTaraz(taraz, region);
+  showResult(taraz, rank, region);
 }
 
+// ۲. محاسبه مستقیم (وقتی کاربر رتبه یا تراز رو خودش داره)
 function calcDirect(){
+  var region = document.getElementById('regionSelect').value;
   var type = document.querySelector('input[name="directType"]:checked').value;
   var val = parseFloat(document.getElementById('directValue').value);
   
@@ -246,36 +302,20 @@ function calcDirect(){
   var taraz, rank;
   if(type === 'taraz') {
     taraz = val;
-    rank = tarazToRank(taraz);
+    rank = getRankFromTaraz(taraz, region); // تراز به رتبه
   } else {
     rank = val;
-    var table = [
-      [11511, 10], [10800, 112], [10200, 500], [10050, 716],
-      [9900, 1000], [9650, 1500], [9500, 2000], [9350, 2500]
-    ];
-    if(rank <= table[0][1]) taraz = table[0][0];
-    else if(rank >= table[table.length-1][1]) taraz = table[table.length-1][0];
-    else {
-      for(var i=0;i<table.length-1;i++){
-        var hi = table[i], lo = table[i+1];
-        if(rank >= hi[1] && rank <= lo[1]){
-          var ratio = (rank - hi[1]) / (lo[1] - hi[1]);
-          taraz = hi[0] + ratio * (lo[0] - hi[0]);
-          break;
-        }
-      }
-    }
+    taraz = getTarazFromRank(rank, region); // رتبه به تراز
   }
-  showResult(taraz, rank);
+  showResult(taraz, rank, region);
 }
 
-function tarazToRank(taraz) {
-  var table = [
-    [11511, 10], [10800, 112], [10200, 500], [10050, 716],
-    [9900, 1000], [9650, 1500], [9500, 2000], [9350, 2500]
-  ];
+// تابع تبدیل تراز به رتبه بر اساس منطقه
+function getRankFromTaraz(taraz, region) {
+  var table = tarazRankTable[region];
   if(taraz >= table[0][0]) return table[0][1];
   if(taraz <= table[table.length-1][0]) return table[table.length-1][1];
+  
   for(var k=0;k<table.length-1;k++){
     var hi = table[k], lo = table[k+1];
     if(taraz <= hi[0] && taraz >= lo[0]){
@@ -286,27 +326,47 @@ function tarazToRank(taraz) {
   return null;
 }
 
-function showResult(taraz, rank) {
+// تابع تبدیل رتبه به تراز بر اساس منطقه
+function getTarazFromRank(rank, region) {
+  var table = tarazRankTable[region];
+  if(rank <= table[0][1]) return table[0][0];
+  if(rank >= table[table.length-1][1]) return table[table.length-1][0];
+  
+  for(var i=0;i<table.length-1;i++){
+    var hi = table[i], lo = table[i+1];
+    if(rank >= hi[1] && rank <= lo[1]){
+      var ratio = (rank - hi[1]) / (lo[1] - hi[1]);
+      return Math.round(hi[0] + ratio * (lo[0] - hi[0]));
+    }
+  }
+  return null;
+}
+
+function showResult(taraz, rank, region) {
   document.getElementById('outTaraz').innerText = Math.round(taraz).toLocaleString('fa-IR');
   document.getElementById('outRank').innerText = rank ? rank.toLocaleString('fa-IR') : '-';
 
   var yesList = [], maybeList = [];
+  var data = unisData[region];
 
   function filterUnis(arr, type) {
     for(var u=0; u<arr.length; u++){
       var diff = arr[u].last - rank;
       var item = {name: type + ' ' + arr[u].name, last: arr[u].last};
       
-      if(diff >= 50) {
+      var yesThreshold = region === "3" ? 100 : 50;
+      var maybeThreshold = region === "3" ? -150 : -100;
+
+      if(diff >= yesThreshold) {
         yesList.push(item);
-      } else if(diff >= -100 && diff < 50) {
+      } else if(diff >= maybeThreshold && diff < yesThreshold) {
         maybeList.push(item);
       }
     }
   }
 
-  filterUnis(medicalUnis, '🩺');
-  filterUnis(dentalUnis, '🦷');
+  filterUnis(data.medical, '🩺');
+  filterUnis(data.dental, '🦷');
 
   var yesDiv = document.getElementById('uniYes');
   yesDiv.innerHTML = '';
