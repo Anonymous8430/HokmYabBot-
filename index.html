@@ -51,7 +51,6 @@
     margin-bottom: 15px;
   }
   
-  /* استایل جستجو */
   .search-box {
     width: 100%; padding: 12px; margin-bottom: 15px;
     border: 1px solid rgba(255,255,255,0.3); border-radius: 12px;
@@ -157,7 +156,6 @@
   <h1>🧮 تراز، رتبه و دانشگاه‌ها</h1>
   <div class="sub">آخرین رتبه‌های ۴۰۴ (تفکیک نوع پذیرش)</div>
 
-  <!-- کادر جستجو -->
   <input type="text" id="searchInput" class="search-box" placeholder="🔍 جستجوی نام شهر (مثلاً تهران)..." onkeyup="searchUniversities()">
 
   <div class="selector-row">
@@ -219,7 +217,6 @@
 
 <!-- 👇 کدهای اصلی برنامه 👇 -->
 <script>
-// 🔴 دیتابیس دانشگاه‌ها (دقیقاً بر اساس فایل ۴۰۴)
 var unisData = {
   "1": {
     medicine: [
@@ -297,7 +294,6 @@ var unisData = {
   }
 };
 
-// 🔴 جداول تبدیل تراز به رتبه (مرتب‌شده دقیق از بالا به پایین)
 var tarazRankTable = {
   "1": [
     [11021, 56], [10705, 158], [10415, 315], [10250, 468], [10193, 500], 
@@ -430,10 +426,22 @@ function calcDirect(){
   showResult(taraz, rank, region);
 }
 
+// 🔴 توابع اصلاح‌شده برای جلوگیری از گیر کردن در سقف و کف جدول
 function getRankFromTaraz(taraz, region) {
   var table = tarazRankTable[region];
-  if(taraz >= table[0][0]) return table[0][1];
-  if(taraz <= table[table.length-1][0]) return table[table.length-1][1];
+  
+  if(taraz > table[0][0]) {
+    var ratioTop = (taraz - table[0][0]) / (table[0][0] - table[1][0]);
+    var estimatedRank = table[0][1] - (ratioTop * (table[1][1] - table[0][1]));
+    return Math.max(1, Math.round(estimatedRank)); 
+  }
+  
+  if(taraz < table[table.length-1][0]) {
+    var ratioBot = (table[table.length-2][0] - taraz) / (table[table.length-2][0] - table[table.length-1][0]);
+    var estimatedRankBot = table[table.length-2][1] + (ratioBot * (table[table.length-1][1] - table[table.length-2][1]));
+    return Math.round(estimatedRankBot);
+  }
+  
   for(var k=0;k<table.length-1;k++){
     var hi = table[k], lo = table[k+1];
     if(taraz <= hi[0] && taraz >= lo[0]){
@@ -446,8 +454,17 @@ function getRankFromTaraz(taraz, region) {
 
 function getTarazFromRank(rank, region) {
   var table = tarazRankTable[region];
-  if(rank <= table[0][1]) return table[0][0];
-  if(rank >= table[table.length-1][1]) return table[table.length-1][0];
+  
+  if(rank < table[0][1]) {
+    var ratioTop = (table[0][1] - rank) / (table[1][1] - table[0][1]);
+    return Math.round(table[0][0] + ratioTop * (table[0][0] - table[1][0]));
+  }
+  
+  if(rank > table[table.length-1][1]) {
+    var ratioBot = (rank - table[table.length-2][1]) / (table[table.length-1][1] - table[table.length-2][1]);
+    return Math.round(table[table.length-2][0] - ratioBot * (table[table.length-2][0] - table[table.length-1][0]));
+  }
+  
   for(var i=0;i<table.length-1;i++){
     var hi = table[i], lo = table[i+1];
     if(rank >= hi[1] && rank <= lo[1]){
