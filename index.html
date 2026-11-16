@@ -5,138 +5,185 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>تراز، رتبه و دانشگاه‌ها</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* پس زمینه متحرک */
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
   body {
-    font-family: Tahoma, sans-serif;
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1e3c72);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 20px;
+    color: #fff;
   }
+
+  /* کادر شیشه‌ای (Glassmorphism) */
   .box {
-    background: #fff;
-    border-radius: 20px;
-    padding: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 25px;
     max-width: 540px;
     width: 100%;
-    box-shadow: 0 20px 60px rgba(0,0,0,.3);
+    box-shadow: 0 25px 45px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05);
     position: relative;
+    overflow: hidden;
   }
+
   h1 {
     text-align: center;
-    color: #1e3c72;
-    font-size: 20px;
+    font-size: 22px;
     margin-bottom: 5px;
+    background: linear-gradient(to right, #00d2ff, #3a7bd5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(0, 210, 255, 0.3);
   }
   .sub {
     text-align: center;
-    color: #888;
+    color: rgba(255,255,255,0.6);
     font-size: 12px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
   }
   
-  .region-select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 2px solid #2a5298;
-    border-radius: 10px;
-    font-family: Tahoma;
-    font-size: 14px;
-    text-align: center;
-    background: #f0f4f8;
-    outline: none;
+  .selector-row {
+    display: flex; gap: 10px; margin-bottom: 20px;
   }
+  .selector-row select {
+    flex: 1; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 12px;
+    font-size: 14px; text-align: center; background: rgba(0,0,0,0.2); color: #fff; outline: none;
+    appearance: none;
+  }
+  .selector-row select option { background: #1e3c72; color: #fff; }
 
   .row {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin: 12px 0;
+    margin: 15px 0;
   }
-  .row label { flex: 1; font-size: 14px; color: #333; }
+  .row label { flex: 1; font-size: 15px; color: rgba(255,255,255,0.9); }
   .row .coef {
-    font-size: 11px; color: #e67e22; background: #fef5e7;
-    padding: 2px 8px; border-radius: 20px;
+    font-size: 11px; color: #00d2ff; background: rgba(0, 210, 255, 0.1);
+    padding: 3px 8px; border-radius: 20px; border: 1px solid rgba(0, 210, 255, 0.2);
   }
   .row input {
-    width: 100px; padding: 10px; border: 2px solid #e0e0e0;
-    border-radius: 10px; text-align: center; font-size: 15px; outline: none;
+    width: 110px; padding: 12px; border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px; text-align: center; font-size: 16px; outline: none;
+    background: rgba(0,0,0,0.2); color: #fff; transition: 0.3s;
   }
-  .row input:focus { border-color: #2a5298; }
+  .row input:focus { border-color: #00d2ff; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); background: rgba(0,0,0,0.4); }
+  
+  /* دکمه اصلی نئونی */
   button {
-    width: 100%; padding: 14px;
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    width: 100%; padding: 15px;
+    background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
     color: #fff; border: none; border-radius: 12px;
-    font-size: 16px; font-family: Tahoma; cursor: pointer;
-    margin-top: 20px;
+    font-size: 16px; font-weight: bold; cursor: pointer;
+    margin-top: 25px; transition: 0.3s;
+    box-shadow: 0 5px 15px rgba(0, 210, 255, 0.4);
   }
+  button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 210, 255, 0.6); }
+  button:active { transform: translateY(1px); }
   
   .switch-btn {
-    background: #f0f4f8;
-    color: #1e3c72;
-    border: 2px solid #1e3c72;
+    background: transparent;
+    color: #00d2ff;
+    border: 1px solid #00d2ff;
     margin-top: 15px;
-    padding: 10px;
+    padding: 12px;
     font-size: 14px;
+    box-shadow: none;
   }
+  .switch-btn:hover { background: rgba(0, 210, 255, 0.1); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
 
   #directForm { display: none; }
   .radio-group {
     display: flex; justify-content: center; gap: 20px;
     margin-bottom: 15px; font-size: 14px;
   }
-  .radio-group label { cursor: pointer; }
-  .radio-group input[type="radio"] { margin-left: 5px; }
+  .radio-group label { cursor: pointer; display: flex; align-items: center; gap: 5px; }
+  .radio-group input[type="radio"] { accent-color: #00d2ff; transform: scale(1.2); }
   .direct-row { justify-content: center; margin-top: 20px; }
   .direct-row label { flex: none; margin-left: 10px; }
 
-  .result {
-    margin-top: 20px; padding: 20px;
-    background: linear-gradient(135deg, #e8f6ef, #d4efdf);
-    border-radius: 15px; display: none;
+  /* بخش نتایج با انیمیشن ورود */
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
   }
-  .result .item { margin: 8px 0; font-size: 15px; text-align: center; }
-  .result .big { font-size: 32px; font-weight: bold; color: #1e8449; }
-  .result .rank { font-size: 24px; font-weight: bold; color: #c0392b; }
+  .result {
+    margin-top: 25px; padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 210, 255, 0.3);
+    border-radius: 16px; display: none;
+    animation: slideUp 0.5s ease forwards;
+  }
+  .result .item { margin: 10px 0; font-size: 15px; text-align: center; }
+  .result .big { font-size: 36px; font-weight: bold; color: #00d2ff; text-shadow: 0 0 20px rgba(0,210,255,0.5); }
+  .result .rank { font-size: 28px; font-weight: bold; color: #ff416c; text-shadow: 0 0 20px rgba(255,65,108,0.5); }
   
   .unis {
-    margin-top: 15px; padding-top: 15px;
-    border-top: 1px dashed #aaa;
+    margin-top: 20px; padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
   }
   .unis h3 {
-    font-size: 15px; color: #1e3c72; margin-bottom: 10px;
-    text-align: center;
+    font-size: 14px; color: #fff; margin-bottom: 10px;
+    text-align: center; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 8px;
   }
   .uni-item {
-    display: flex; justify-content: space-between;
-    padding: 8px 12px; margin: 6px 0;
-    border-radius: 10px; font-size: 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 12px; margin: 8px 0;
+    border-radius: 10px; font-size: 13px;
+    background: rgba(255,255,255,0.05);
+    border-right: 4px solid transparent;
+    transition: 0.2s;
   }
-  .uni-yes { background: #d4efdf; color: #1e8449; }
-  .uni-maybe { background: #fef9e7; color: #b7950b; }
+  .uni-item:hover { background: rgba(255,255,255,0.1); }
+  .uni-yes { border-right-color: #2ecc71; }
+  .uni-yes .name { color: #a3e4d7; }
+  .uni-maybe { border-right-color: #f1c40f; }
+  .uni-maybe .name { color: #f9e79f; }
+  
   .uni-item .name { font-weight: bold; }
-  .uni-item .last { font-size: 12px; opacity: .8; }
+  .uni-item .last { font-size: 11px; opacity: 0.8; }
+  .uni-type { font-size: 10px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 5px; margin-right: 5px; color: #fff;}
 
   .channel {
-    text-align: center; margin-top: 20px; padding-top: 15px;
-    border-top: 1px dashed #ddd; font-size: 13px;
+    text-align: center; margin-top: 25px; padding-top: 15px;
+    border-top: 1px dashed rgba(255,255,255,0.2); font-size: 13px;
   }
-  .channel a { color: #2a5298; text-decoration: none; font-weight: bold; }
+  .channel a { color: #00d2ff; text-decoration: none; font-weight: bold; text-shadow: 0 0 10px rgba(0,210,255,0.5); }
 </style>
 </head>
 <body>
 <div class="box">
   <h1>🧮 تراز، رتبه و دانشگاه‌ها</h1>
-  <div class="sub">آخرین رتبه‌های ۴۰۴</div>
+  <div class="sub">آخرین رتبه‌های ۴۰۴ (تفکیک نوع پذیرش)</div>
 
-  <!-- انتخاب منطقه -->
-  <select id="regionSelect" class="region-select" onchange="clearResults()">
-    <option value="1">منطقه ۱</option>
-    <option value="3">منطقه ۳</option>
-  </select>
+  <!-- انتخاب منطقه و رشته -->
+  <div class="selector-row">
+    <select id="regionSelect" onchange="clearResults()">
+      <option value="1">منطقه ۱</option>
+      <option value="3">منطقه ۳</option>
+    </select>
+    <select id="majorSelect" onchange="clearResults()">
+      <option value="medicine">پزشکی</option>
+      <option value="dental">دندان‌پزشکی</option>
+      <option value="pharmacy">داروسازی</option>
+      <option value="physio">فیزیوتراپی</option>
+      <option value="optometry">بینایی‌سنجی</option>
+    </select>
+  </div>
 
   <div id="percentForm">
     <div class="row"><label>زیست‌شناسی</label><span class="coef">۱۲</span><input id="d1" type="number" placeholder="%"></div>
@@ -164,12 +211,8 @@
     <div class="item">تراز تخمینی/واقعی: <span class="big" id="outTaraz">0</span></div>
     <div class="item">رتبه تخمینی: <span class="rank" id="outRank">-</span></div>
 
-    <div class="unis">
-      <h3>✅ دانشگاه‌هایی که شانس قبولی داری</h3>
-      <div id="uniYes"></div>
-      
-      <h3 style="margin-top:15px;">⚠️ نزدیک به رتبه‌ات (شانس کم)</h3>
-      <div id="uniMaybe"></div>
+    <div class="unis" id="uniResults">
+      <!-- لیست دانشگاه‌ها -->
     </div>
   </div>
 
@@ -179,7 +222,7 @@
 <!-- 👇 قفل امنیتی دامنه 👇 -->
 <script>
   if (window.location.hostname !== 'anonymous8430.github.io') {
-    document.body.innerHTML = "<div style='text-align:center; padding:50px; font-family:Tahoma; background:#fff; height:100vh;'><h1>⚠️ دسترسی غیرمجاز</h1><p>این برنامه فقط از طریق ربات تلگرام حکم یاب قابل استفاده است.</p><a href='https://t.me/HokmYabBot' style='color:blue;'>ورود به ربات تلگرام</a></div>";
+    document.body.innerHTML = "<div style='text-align:center; padding:50px; font-family:Tahoma; background:#fff; height:100vh; color:#000;'><h1>⚠️ دسترسی غیرمجاز</h1><p>این برنامه فقط از طریق ربات تلگرام حکم یاب قابل استفاده است.</p><a href='https://t.me/HokmYabBot' style='color:blue;'>ورود به ربات تلگرام</a></div>";
     throw new Error("Unauthorized domain");
   }
 </script>
@@ -189,46 +232,82 @@
 // دیتابیس دانشگاه‌ها
 var unisData = {
   "1": {
-    medical: [
-      {name: 'پزشکی تهران', last: 51}, {name: 'پزشکی شهید بهشتی', last: 200},
-      {name: 'پزشکی مشهد', last: 248}, {name: 'پزشکی شیراز', last: 281},
-      {name: 'پزشکی ایران', last: 358}, {name: 'پزشکی تبریز', last: 491},
-      {name: 'پزشکی اصفهان', last: 582}, {name: 'پزشکی بابل', last: 732},
-      {name: 'پزشکی کرمانشاه', last: 918}, {name: 'پزشکی اهواز', last: 1121},
-      {name: 'پزشکی زنجان', last: 1560}, {name: 'پزشکی ارومیه', last: 1821},
-      {name: 'پزشکی اراک', last: 2411}, {name: 'پزشکی قزوین', last: 2854},
-      {name: 'پزشکی سمنان', last: 3420}, {name: 'پزشکی شهرکرد', last: 3845}
+    medicine: [
+      {name: 'پزشکی تهران', last: 51, type: 'روزانه'}, {name: 'پزشکی شهید بهشتی', last: 200, type: 'روزانه'},
+      {name: 'پزشکی مشهد', last: 248, type: 'روزانه'}, {name: 'پزشکی شیراز', last: 281, type: 'روزانه'},
+      {name: 'پزشکی ایران', last: 358, type: 'روزانه'}, {name: 'پزشکی تبریز', last: 491, type: 'روزانه'},
+      {name: 'پزشکی اصفهان', last: 582, type: 'روزانه'}, {name: 'پزشکی بابل', last: 732, type: 'روزانه'},
+      {name: 'پزشکی کرمانشاه', last: 918, type: 'روزانه'}, {name: 'پزشکی اهواز', last: 1121, type: 'روزانه'},
+      {name: 'پزشکی زنجان', last: 1560, type: 'روزانه'}, {name: 'پزشکی ارومیه', last: 1821, type: 'روزانه'},
+      {name: 'پزشکی اراک', last: 2411, type: 'روزانه'}, {name: 'پزشکی قزوین', last: 2854, type: 'روزانه'},
+      {name: 'پزشکی سمنان', last: 3420, type: 'روزانه'}, {name: 'پزشکی شهرکرد', last: 3845, type: 'روزانه'},
+      {name: 'پزشکی ایرانشهر', last: 6842, type: 'تعهدی'}, {name: 'پزشکی زاهدان', last: 7350, type: 'تعهدی'}
     ],
     dental: [
-      {name: 'دندان‌پزشکی تهران', last: 66}, {name: 'دندان‌پزشکی شهید بهشتی', last: 95},
-      {name: 'دندان‌پزشکی مشهد', last: 171}, {name: 'دندان‌پزشکی شیراز', last: 232},
-      {name: 'دندان‌پزشکی اصفهان', last: 321}, {name: 'دندان‌پزشکی تبریز', last: 409},
-      {name: 'دندان‌پزشکی بابل', last: 625}, {name: 'دندان‌پزشکی کرمان', last: 812},
-      {name: 'دندان‌پزشکی اهواز', last: 1105}, {name: 'دندان‌پزشکی یزد', last: 1543}
+      {name: 'دندان‌پزشکی تهران', last: 66, type: 'روزانه'}, {name: 'دندان‌پزشکی شهید بهشتی', last: 95, type: 'روزانه'},
+      {name: 'دندان‌پزشکی مشهد', last: 171, type: 'روزانه'}, {name: 'دندان‌پزشکی شیراز', last: 232, type: 'روزانه'},
+      {name: 'دندان‌پزشکی اصفهان', last: 321, type: 'روزانه'}, {name: 'دندان‌پزشکی تبریز', last: 409, type: 'روزانه'},
+      {name: 'دندان‌پزشکی بابل', last: 625, type: 'روزانه'}, {name: 'دندان‌پزشکی کرمان', last: 812, type: 'روزانه'},
+      {name: 'دندان‌پزشکی اهواز', last: 1105, type: 'روزانه'}, {name: 'دندان‌پزشکی یزد', last: 1543, type: 'روزانه'},
+      {name: 'دندان‌پزشکی تهران', last: 2450, type: 'پردیس'}, {name: 'دندان‌پزشکی شهید بهشتی', last: 2800, type: 'پردیس'}
+    ],
+    pharmacy: [
+      {name: 'داروسازی تهران', last: 350, type: 'روزانه'}, {name: 'داروسازی شهید بهشتی', last: 520, type: 'روزانه'},
+      {name: 'داروسازی مشهد', last: 680, type: 'روزانه'}, {name: 'داروسازی شیراز', last: 820, type: 'روزانه'},
+      {name: 'داروسازی اصفهان', last: 1150, type: 'روزانه'}, {name: 'داروسازی تبریز', last: 1400, type: 'روزانه'},
+      {name: 'داروسازی تهران', last: 3500, type: 'پردیس'}, {name: 'داروسازی مشهد', last: 4200, type: 'پردیس'}
+    ],
+    physio: [
+      {name: 'فیزیوتراپی تهران', last: 160, type: 'روزانه'}, {name: 'فیزیوتراپی شهید بهشتی', last: 290, type: 'روزانه'},
+      {name: 'فیزیوتراپی مشهد', last: 410, type: 'روزانه'}, {name: 'فیزیوتراپی شیراز', last: 550, type: 'روزانه'},
+      {name: 'فیزیوتراپی اصفهان', last: 780, type: 'روزانه'}, {name: 'فیزیوتراپی تبریز', last: 950, type: 'روزانه'},
+      {name: 'فیزیوتراپی ایران', last: 1200, type: 'روزانه'}, {name: 'فیزیوتراپی بابل', last: 1850, type: 'روزانه'}
+    ],
+    optometry: [
+      {name: 'بینایی‌سنجی شهید بهشتی', last: 520, type: 'روزانه'}, {name: 'بینایی‌سنجی ایران', last: 850, type: 'روزانه'},
+      {name: 'بینایی‌سنجی مشهد', last: 1100, type: 'روزانه'}, {name: 'بینایی‌سنجی علوم پزشکی تهران', last: 1400, type: 'روزانه'}
     ]
   },
   "3": {
-    medical: [
-      {name: 'پزشکی تهران', last: 101}, {name: 'پزشکی شهید بهشتی', last: 344},
-      {name: 'پزشکی مشهد', last: 532}, {name: 'پزشکی شیراز', last: 633},
-      {name: 'پزشکی ایران', last: 702}, {name: 'پزشکی تبریز', last: 1035},
-      {name: 'پزشکی اصفهان', last: 1344}, {name: 'پزشکی بابل', last: 1655},
-      {name: 'پزشکی کرمانشاه', last: 1850}, {name: 'پزشکی اهواز', last: 2010},
-      {name: 'پزشکی زنجان', last: 2500}, {name: 'پزشکی ارومیه', last: 2800},
-      {name: 'پزشکی اراک', last: 3100}, {name: 'پزشکی قزوین', last: 3400},
-      {name: 'پزشکی سمنان', last: 3800}, {name: 'پزشکی شهرکرد', last: 4200}
+    medicine: [
+      {name: 'پزشکی تهران', last: 101, type: 'روزانه'}, {name: 'پزشکی شهید بهشتی', last: 344, type: 'روزانه'},
+      {name: 'پزشکی مشهد', last: 532, type: 'روزانه'}, {name: 'پزشکی شیراز', last: 633, type: 'روزانه'},
+      {name: 'پزشکی ایران', last: 702, type: 'روزانه'}, {name: 'پزشکی تبریز', last: 1035, type: 'روزانه'},
+      {name: 'پزشکی اصفهان', last: 1344, type: 'روزانه'}, {name: 'پزشکی بابل', last: 1655, type: 'روزانه'},
+      {name: 'پزشکی کرمانشاه', last: 1850, type: 'روزانه'}, {name: 'پزشکی اهواز', last: 2010, type: 'روزانه'},
+      {name: 'پزشکی زنجان', last: 2500, type: 'روزانه'}, {name: 'پزشکی ارومیه', last: 2800, type: 'روزانه'},
+      {name: 'پزشکی اراک', last: 3100, type: 'روزانه'}, {name: 'پزشکی قزوین', last: 3400, type: 'روزانه'},
+      {name: 'پزشکی ایرانشهر', last: 6800, type: 'تعهدی'}, {name: 'پزشکی زاهدان', last: 7200, type: 'تعهدی'},
+      {name: 'پزشکی تهران', last: 8000, type: 'پردیس'}
     ],
     dental: [
-      {name: 'دندان‌پزشکی تهران', last: 150}, {name: 'دندان‌پزشکی شهید بهشتی', last: 210},
-      {name: 'دندان‌پزشکی مشهد', last: 400}, {name: 'دندان‌پزشکی شیراز', last: 550},
-      {name: 'دندان‌پزشکی اصفهان', last: 700}, {name: 'دندان‌پزشکی تبریز', last: 900},
-      {name: 'دندان‌پزشکی بابل', last: 1300}, {name: 'دندان‌پزشکی کرمان', last: 1700},
-      {name: 'دندان‌پزشکی اهواز', last: 2000}, {name: 'دندان‌پزشکی یزد', last: 2400}
+      {name: 'دندان‌پزشکی تهران', last: 150, type: 'روزانه'}, {name: 'دندان‌پزشکی شهید بهشتی', last: 210, type: 'روزانه'},
+      {name: 'دندان‌پزشکی مشهد', last: 400, type: 'روزانه'}, {name: 'دندان‌پزشکی شیراز', last: 550, type: 'روزانه'},
+      {name: 'دندان‌پزشکی اصفهان', last: 700, type: 'روزانه'}, {name: 'دندان‌پزشکی تبریز', last: 900, type: 'روزانه'},
+      {name: 'دندان‌پزشکی بابل', last: 1300, type: 'روزانه'}, {name: 'دندان‌پزشکی کرمان', last: 1700, type: 'روزانه'},
+      {name: 'دندان‌پزشکی اهواز', last: 2000, type: 'روزانه'}, {name: 'دندان‌پزشکی یزد', last: 2400, type: 'روزانه'},
+      {name: 'دندان‌پزشکی تهران', last: 3500, type: 'پردیس'}, {name: 'دندان‌پزشکی اصفهان', last: 4000, type: 'پردیس'}
+    ],
+    pharmacy: [
+      {name: 'داروسازی تهران', last: 400, type: 'روزانه'}, {name: 'داروسازی شهید بهشتی', last: 620, type: 'روزانه'},
+      {name: 'داروسازی مشهد', last: 850, type: 'روزانه'}, {name: 'داروسازی شیراز', last: 1100, type: 'روزانه'},
+      {name: 'داروسازی اصفهان', last: 1400, type: 'روزانه'}, {name: 'داروسازی تبریز', last: 1800, type: 'روزانه'},
+      {name: 'داروسازی تهران', last: 4000, type: 'پردیس'}, {name: 'داروسازی مشهد', last: 4800, type: 'پردیس'}
+    ],
+    physio: [
+      {name: 'فیزیوتراپی تهران', last: 250, type: 'روزانه'}, {name: 'فیزیوتراپی شهید بهشتی', last: 380, type: 'روزانه'},
+      {name: 'فیزیوتراپی مشهد', last: 600, type: 'روزانه'}, {name: 'فیزیوتراپی شیراز', last: 800, type: 'روزانه'},
+      {name: 'فیزیوتراپی اصفهان', last: 1100, type: 'روزانه'}, {name: 'فیزیوتراپی تبریز', last: 1400, type: 'روزانه'},
+      {name: 'فیزیوتراپی ایران', last: 1700, type: 'روزانه'}, {name: 'فیزیوتراپی بابل', last: 2200, type: 'روزانه'}
+    ],
+    optometry: [
+      {name: 'بینایی‌سنجی شهید بهشتی', last: 750, type: 'روزانه'}, {name: 'بینایی‌سنجی ایران', last: 1100, type: 'روزانه'},
+      {name: 'بینایی‌سنجی مشهد', last: 1500, type: 'روزانه'}, {name: 'بینایی‌سنجی علوم پزشکی تهران', last: 1900, type: 'روزانه'}
     ]
   }
 };
 
-// جداول تبدیل تراز به رتبه (مرتب‌شده از تراز بالا به پایین)
+// جداول تبدیل تراز به رتبه
 var tarazRankTable = {
   "1": [
     [11511, 10], [10800, 112], [10200, 500], [10050, 716],
@@ -259,11 +338,8 @@ function switchMode(mode) {
   }
 }
 
-// ۱. محاسبه تراز از درصد
 function calcPercent(){
   var region = document.getElementById('regionSelect').value;
-  
-  // فرمول تبدیل درصد به تراز (ثابت برای کل کشور)
   var w = [2.6, 1.5, 1.9, 1.5]; 
   var sumW = 0;
   for(var j=0;j<4;j++) sumW += w[j];
@@ -279,16 +355,11 @@ function calcPercent(){
     wa += avgs[i] * w[i];
   }
   wp /= sumW; wa /= sumW;
-  
-  // اینجا تراز به دست میاد
   var taraz = baseTaraz + (wp - wa) * K;
-
-  // حالا تراز رو میدیم به تابع تبدیل به رتبه (بر اساس منطقه)
   var rank = getRankFromTaraz(taraz, region);
   showResult(taraz, rank, region);
 }
 
-// ۲. محاسبه مستقیم (وقتی کاربر رتبه یا تراز رو خودش داره)
 function calcDirect(){
   var region = document.getElementById('regionSelect').value;
   var type = document.querySelector('input[name="directType"]:checked').value;
@@ -302,20 +373,18 @@ function calcDirect(){
   var taraz, rank;
   if(type === 'taraz') {
     taraz = val;
-    rank = getRankFromTaraz(taraz, region); // تراز به رتبه
+    rank = getRankFromTaraz(taraz, region);
   } else {
     rank = val;
-    taraz = getTarazFromRank(rank, region); // رتبه به تراز
+    taraz = getTarazFromRank(rank, region);
   }
   showResult(taraz, rank, region);
 }
 
-// تابع تبدیل تراز به رتبه بر اساس منطقه
 function getRankFromTaraz(taraz, region) {
   var table = tarazRankTable[region];
   if(taraz >= table[0][0]) return table[0][1];
   if(taraz <= table[table.length-1][0]) return table[table.length-1][1];
-  
   for(var k=0;k<table.length-1;k++){
     var hi = table[k], lo = table[k+1];
     if(taraz <= hi[0] && taraz >= lo[0]){
@@ -326,12 +395,10 @@ function getRankFromTaraz(taraz, region) {
   return null;
 }
 
-// تابع تبدیل رتبه به تراز بر اساس منطقه
 function getTarazFromRank(rank, region) {
   var table = tarazRankTable[region];
   if(rank <= table[0][1]) return table[0][0];
   if(rank >= table[table.length-1][1]) return table[table.length-1][0];
-  
   for(var i=0;i<table.length-1;i++){
     var hi = table[i], lo = table[i+1];
     if(rank >= hi[1] && rank <= lo[1]){
@@ -346,56 +413,55 @@ function showResult(taraz, rank, region) {
   document.getElementById('outTaraz').innerText = Math.round(taraz).toLocaleString('fa-IR');
   document.getElementById('outRank').innerText = rank ? rank.toLocaleString('fa-IR') : '-';
 
+  var major = document.getElementById('majorSelect').value;
+  var data = unisData[region][major];
+  
   var yesList = [], maybeList = [];
-  var data = unisData[region];
 
-  function filterUnis(arr, type) {
-    for(var u=0; u<arr.length; u++){
-      var diff = arr[u].last - rank;
-      var item = {name: type + ' ' + arr[u].name, last: arr[u].last};
-      
-      var yesThreshold = region === "3" ? 100 : 50;
-      var maybeThreshold = region === "3" ? -150 : -100;
+  for(var u=0; u<data.length; u++){
+    var diff = data[u].last - rank;
+    var item = data[u];
+    
+    var yesThreshold = (region === "3" || major !== 'medicine') ? 80 : 50;
+    var maybeThreshold = (region === "3" || major !== 'medicine') ? -120 : -100;
 
-      if(diff >= yesThreshold) {
-        yesList.push(item);
-      } else if(diff >= maybeThreshold && diff < yesThreshold) {
-        maybeList.push(item);
-      }
+    if(diff >= yesThreshold) {
+      yesList.push(item);
+    } else if(diff >= maybeThreshold && diff < yesThreshold) {
+      maybeList.push(item);
     }
   }
 
-  filterUnis(data.medical, '🩺');
-  filterUnis(data.dental, '🦷');
+  var resDiv = document.getElementById('uniResults');
+  resDiv.innerHTML = '';
 
-  var yesDiv = document.getElementById('uniYes');
-  yesDiv.innerHTML = '';
+  var majorNames = {
+    medicine: 'پزشکی', dental: 'دندان‌پزشکی', pharmacy: 'داروسازی', physio: 'فیزیوتراپی', optometry: 'بینایی‌سنجی'
+  };
+
+  var yesHtml = '<h3>✅ ' + majorNames[major] + ' - شانس بالا</h3>';
   if(yesList.length === 0){
-    yesDiv.innerHTML = '<div style="text-align:center;color:#888;font-size:13px;">هیچ دانشگاهی در محدوده مطمئن نیست.</div>';
+    yesHtml += '<div style="text-align:center;color:#aaa;font-size:12px;margin-bottom:10px;">دانشگاهی پیدا نشد.</div>';
   } else {
     for(var i=0; i<yesList.length; i++){
-      var d = document.createElement('div');
-      d.className = 'uni-item uni-yes';
-      d.innerHTML = '<span class="name">✅ ' + yesList[i].name + '</span>' +
-                    '<span class="last">آخرین: ' + yesList[i].last.toLocaleString('fa-IR') + '</span>';
-      yesDiv.appendChild(d);
+      yesHtml += '<div class="uni-item uni-yes">' +
+                 '<span class="name">' + yesList[i].name + ' <span class="uni-type">' + yesList[i].type + '</span></span>' +
+                 '<span class="last">آخرین: ' + yesList[i].last.toLocaleString('fa-IR') + '</span></div>';
     }
   }
-
-  var maybeDiv = document.getElementById('uniMaybe');
-  maybeDiv.innerHTML = '';
+  
+  var maybeHtml = '<h3 style="margin-top:15px;">⚠️ ' + majorNames[major] + ' - شانس کم / مرز</h3>';
   if(maybeList.length === 0){
-    maybeDiv.innerHTML = '<div style="text-align:center;color:#888;font-size:13px;">دانشگاه نزدیکی پیدا نشد.</div>';
+    maybeHtml += '<div style="text-align:center;color:#aaa;font-size:12px;">دانشگاهی پیدا نشد.</div>';
   } else {
     for(var j=0; j<maybeList.length; j++){
-      var d2 = document.createElement('div');
-      d2.className = 'uni-item uni-maybe';
-      d2.innerHTML = '<span class="name">⚠️ ' + maybeList[j].name + '</span>' +
-                     '<span class="last">آخرین: ' + maybeList[j].last.toLocaleString('fa-IR') + '</span>';
-      maybeDiv.appendChild(d2);
+      maybeHtml += '<div class="uni-item uni-maybe">' +
+                   '<span class="name">' + maybeList[j].name + ' <span class="uni-type">' + maybeList[j].type + '</span></span>' +
+                   '<span class="last">آخرین: ' + maybeList[j].last.toLocaleString('fa-IR') + '</span></div>';
     }
   }
 
+  resDiv.innerHTML = yesHtml + maybeHtml;
   document.getElementById('res').style.display = 'block';
 }
 </script>
