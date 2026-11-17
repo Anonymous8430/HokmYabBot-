@@ -359,7 +359,6 @@ var tarazRankTable = {
   ]
 };
 
-// 🔴 داده‌های واقعی شما (میانگین ساده به جای وزنی)
 var realData = [
   {avg: (39+36+27+45)/4, taraz: 8709},
   {avg: (40+21+12+7)/4, taraz: 7395},
@@ -377,7 +376,6 @@ var realData = [
   {avg: (31+28+26+18)/4, taraz: 8008},
   {avg: (33+60+22+37)/4, taraz: 8536}
 ];
-// مرتب‌سازی بر اساس میانگین
 realData.sort((a,b) => a.avg - b.avg);
 
 var majorNames = {
@@ -424,11 +422,8 @@ function switchMode(mode) {
   else { document.getElementById('percentForm').style.display = 'block'; document.getElementById('directForm').style.display = 'none'; }
 }
 
-// 🔴 تابع اصلاح‌شده: استفاده از میانگین ساده برای درون‌یابی
 function calcPercent(){
   var region = document.getElementById('regionSelect').value;
-  
-  // محاسبه میانگین ساده (بدون ضریب)
   var sum = 0;
   for(var i=0; i<4; i++){
     var v = parseFloat(document.getElementById('d'+(i+1)).value);
@@ -437,7 +432,6 @@ function calcPercent(){
   }
   var avgPercent = sum / 4;
   
-  // پیدا کردن جایگاه در داده‌های واقعی
   var taraz = null;
   if(avgPercent <= realData[0].avg) {
     taraz = realData[0].taraz;
@@ -525,7 +519,6 @@ function showResult(taraz, rank, region) {
   document.getElementById('res').style.display = 'block';
 }
 
-
 async function searchChannel() {
   const input = document.getElementById('channelSearch');
   const status = document.getElementById('channelStatus');
@@ -537,7 +530,7 @@ async function searchChannel() {
     return;
   }
 
-  status.textContent = 'در حال جست‌وجو...';
+  status.textContent = 'در حال جست‌وجو و تحلیل معنایی...';
   results.innerHTML = '';
 
   try {
@@ -549,45 +542,65 @@ async function searchChannel() {
     const posts = Array.isArray(data.results) ? data.results : [];
 
     if (posts.length === 0) {
-      status.textContent = 'نتیجه‌ای پیدا نشد';
+      status.textContent = 'هیچ پستی با این مفهوم پیدا نشد. عبارت دیگری را امتحان کنید.';
       return;
     }
 
-    status.textContent = posts.length.toLocaleString('fa-IR') + ' نتیجه پیدا شد';
+    status.textContent = posts.length.toLocaleString('fa-IR') + ' نتیجه مرتبط پیدا شد';
+    renderChannelResults(posts, query);
 
-    posts.forEach(post => {
-      const card = document.createElement('div');
-      card.style.cssText = 'padding:14px;margin:10px 0;background:rgba(255,255,255,.07);border-radius:12px;border-right:3px solid #00d2ff';
-
-      const content = document.createElement('p');
-      content.style.cssText = 'font-size:13px;line-height:2;white-space:pre-wrap;overflow-wrap:anywhere';
-      content.textContent = post.post_text || 'متن این پست موجود نیست';
-      card.appendChild(content);
-
-      if (post.post_date) {
-        const date = document.createElement('small');
-        date.style.cssText = 'display:block;margin-top:8px;color:rgba(255,255,255,.6);direction:ltr;text-align:right';
-        const parsedDate = new Date(post.post_date);
-        date.textContent = isNaN(parsedDate.getTime()) ? '' : parsedDate.toLocaleString('fa-IR');
-        card.appendChild(date);
-      }
-
-      if (post.post_link && /^https:\/\/t\.me\//.test(post.post_link)) {
-        const link = document.createElement('a');
-        link.href = post.post_link;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.textContent = 'مشاهده پست در تلگرام ←';
-        link.style.cssText = 'display:block;margin-top:12px;color:#00d2ff;text-decoration:none';
-        card.appendChild(link);
-      }
-
-      results.appendChild(card);
-    });
   } catch (error) {
     console.error('Channel search error:', error);
     status.textContent = 'ارتباط با سرور برقرار نشد؛ دوباره تلاش کن';
   }
+}
+
+function renderChannelResults(posts, query) {
+  const results = document.getElementById('channelResults');
+  results.innerHTML = '';
+
+  posts.forEach(post => {
+    const card = document.createElement('div');
+    card.style.cssText = 'padding:14px;margin:10px 0;background:rgba(255,255,255,.07);border-radius:12px;border-right:3px solid #00d2ff';
+
+    // نمایش درصد ارتباط (فقط برای جست‌وجوی کانال)
+    if (post.relevance !== undefined) {
+      const relBar = document.createElement('div');
+      relBar.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:11px;color:#a3e4d7;';
+      relBar.innerHTML = `
+        <div style="flex:1;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;">
+          <div style="height:100%;width:${post.relevance}%;background:#00d2ff;"></div>
+        </div>
+        <span>ارتباط: ${post.relevance}٪</span>
+      `;
+      card.appendChild(relBar);
+    }
+
+    const content = document.createElement('p');
+    content.style.cssText = 'font-size:13px;line-height:2;white-space:pre-wrap;overflow-wrap:anywhere;margin:0;';
+    content.textContent = post.post_text || 'متن این پست موجود نیست';
+    card.appendChild(content);
+
+    if (post.post_date) {
+      const date = document.createElement('small');
+      date.style.cssText = 'display:block;margin-top:8px;color:rgba(255,255,255,.5);direction:ltr;text-align:right';
+      const parsedDate = new Date(post.post_date);
+      date.textContent = isNaN(parsedDate.getTime()) ? '' : parsedDate.toLocaleString('fa-IR');
+      card.appendChild(date);
+    }
+
+    if (post.post_link && /^https:\/\/t\.me\//.test(post.post_link)) {
+      const link = document.createElement('a');
+      link.href = post.post_link;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = 'مشاهده پست در تلگرام ←';
+      link.style.cssText = 'display:block;margin-top:10px;color:#00d2ff;text-decoration:none;font-size:12px;';
+      card.appendChild(link);
+    }
+
+    results.appendChild(card);
+  });
 }
 </script>
 </body>
