@@ -124,7 +124,7 @@
 </script>
 
 <script>
-// 🔴 دیتابیس دانشگاه‌ها (برای اضافه کردن دانشگاه جدید، الگوی زیر را کپی کنید)
+// 🔴 دیتابیس دانشگاه‌ها
 var unisData = {
   "1": {
     medicine: [
@@ -321,10 +321,35 @@ var unisData = {
   }
 };
 
+// 🔴 جداول تبدیل تراز به رتبه (مرتب‌سازی دقیق نزولی بر اساس تراز)
 var tarazRankTable = {
-  "1": [ [11021, 56], [10705, 158], [10415, 315], [10250, 468], [10193, 500], [10188, 533], [10110, 411], [10051, 716], [9959, 872], [9879, 1023], [9832, 640], [9828, 1131], [9798, 1182], [9737, 808], [9688, 1465], [9686, 1472], [9683, 1481], [9658, 991], [9653, 1007], [9631, 1060], [9605, 1131], [9572, 1241], [9524, 1383], [9454, 1587], [9451, 1603], [9443, 2269], [9414, 1746], [9361, 1963], [9356, 1986], [9328, 2095], [9279, 2296], [9274, 2320], [9209, 3199], [9207, 2638], [9076, 3812], [9070, 3322], [8897, 4756], [8696, 5906], [8578, 6691], [8564, 7021], [8530, 7314], [8287, 8699], [8276, 9800], [7871, 14497] ],
-  "2": [ [11415, 14], [10915, 95], [10689, 203], [10582, 269], [10440, 397], [10421, 412], [10233, 601], [10203, 646], [10162, 703], [10112, 795], [10093, 827], [9893, 1253], [9788, 1567], [9774, 1619], [9758, 1670], [9736, 1748], [9505, 2726], [9359, 3564], [9267, 4133], [9207, 4523], [9144, 5005], [9032, 5886], [8790, 8145], [8779, 8267], [8588, 10274], [8592, 10215], [8224, 14481], [8251, 14132], [8103, 16100], [7223, 30048] ],
-  "3": [ [10629, 60], [10560, 81], [10193, 239], [10110, 411], [10030, 387], [9832, 640], [9790, 697], [9737, 808], [9658, 991], [9653, 1007], [9631, 1060], [9605, 1131], [9572, 1241], [9524, 1383], [9454, 1587], [9451, 1603], [9414, 1746], [9361, 1963], [9356, 1986], [9328, 2095], [9279, 2296], [9274, 2320], [9207, 2638], [9070, 3322], [8696, 5906], [8564, 7021], [8530, 7314], [8276, 9800], [7871, 14497] ]
+  "1": [ 
+    [11021, 56], [10705, 158], [10415, 315], [10250, 468], [10193, 500], 
+    [10188, 533], [10110, 411], [10051, 716], [9959, 872], [9879, 1023], 
+    [9832, 640], [9828, 1131], [9798, 1182], [9737, 808], [9688, 1465], 
+    [9686, 1472], [9683, 1481], [9658, 991], [9653, 1007], [9631, 1060], 
+    [9605, 1131], [9572, 1241], [9524, 1383], [9454, 1587], [9451, 1603], 
+    [9443, 2269], [9414, 1746], [9361, 1963], [9356, 1986], [9328, 2095], 
+    [9279, 2296], [9274, 2320], [9207, 2638], [9076, 3812], [9070, 3322], 
+    [8897, 4756], [8696, 5906], [8578, 6691], [8564, 7021], [8530, 7314], 
+    [8287, 8699], [8276, 9800], [7871, 14497] 
+  ],
+  "2": [ 
+    [11415, 14], [10915, 95], [10689, 203], [10582, 269], [10440, 397], 
+    [10421, 412], [10233, 601], [10203, 646], [10162, 703], [10112, 795], 
+    [10093, 827], [9893, 1253], [9788, 1567], [9774, 1619], [9758, 1670], 
+    [9736, 1748], [9505, 2726], [9359, 3564], [9267, 4133], [9207, 4523], 
+    [9144, 5005], [9032, 5886], [8790, 8145], [8779, 8267], [8588, 10274], 
+    [8592, 10215], [8224, 14481], [8251, 14132], [8103, 16100], [7223, 30048] 
+  ],
+  "3": [ 
+    [10629, 60], [10560, 81], [10193, 239], [10110, 411], [10030, 387], 
+    [9832, 640], [9790, 697], [9737, 808], [9658, 991], [9653, 1007], 
+    [9631, 1060], [9605, 1131], [9572, 1241], [9524, 1383], [9454, 1587], 
+    [9451, 1603], [9414, 1746], [9361, 1963], [9356, 1986], [9328, 2095], 
+    [9279, 2296], [9274, 2320], [9207, 2638], [9070, 3322], [8696, 5906], 
+    [8564, 7021], [8530, 7314], [8276, 9800], [7871, 14497] 
+  ]
 };
 
 var majorNames = {
@@ -371,11 +396,9 @@ function switchMode(mode) {
   else { document.getElementById('percentForm').style.display = 'block'; document.getElementById('directForm').style.display = 'none'; }
 }
 
-// 🔴 تابع محاسبه تراز از درصد (آپدیت شده با ۱۵ داده جدید)
 function calcPercent(){
   var region = document.getElementById('regionSelect').value;
   
-  // ضرایب و میانگین‌های بهینه‌شده با داده‌های جدید
   var w = [2.8, 1.8, 2.1, 1.7]; 
   var sumW = 0;
   for(var j=0;j<4;j++) sumW += w[j];
@@ -407,18 +430,40 @@ function calcDirect(){
   showResult(taraz, rank, region);
 }
 
+// تابع اصلاح‌شده: تضمین میکند رتبه خروجی همیشه با روند نزولی تراز همخوانی داشته باشد
 function getRankFromTaraz(taraz, region) {
   var table = tarazRankTable[region];
-  if(taraz > table[0][0]) { var ratioTop = (taraz - table[0][0]) / (table[0][0] - table[1][0]); var estimatedRank = table[0][1] - (ratioTop * (table[1][1] - table[0][1])); return Math.max(1, Math.round(estimatedRank)); }
-  if(taraz < table[table.length-1][0]) { var ratioBot = (table[table.length-2][0] - taraz) / (table[table.length-2][0] - table[table.length-1][0]); var estimatedRankBot = table[table.length-2][1] + (ratioBot * (table[table.length-1][1] - table[table.length-2][1])); return Math.round(estimatedRankBot); }
-  for(var k=0;k<table.length-1;k++){ var hi = table[k], lo = table[k+1]; if(taraz <= hi[0] && taraz >= lo[0]){ var ratio = (hi[0]-taraz)/(hi[0]-lo[0]); return Math.round(hi[1] + ratio*(lo[1]-hi[1])); } }
+  
+  // جلوگیری از خروج از محدوده
+  if(taraz >= table[0][0]) { 
+    var ratioTop = (taraz - table[0][0]) / (table[0][0] - table[1][0]); 
+    var estimatedRank = table[0][1] - (ratioTop * (table[1][1] - table[0][1])); 
+    return Math.max(1, Math.round(estimatedRank)); 
+  }
+  if(taraz <= table[table.length-1][0]) { 
+    var ratioBot = (table[table.length-2][0] - taraz) / (table[table.length-2][0] - table[table.length-1][0]); 
+    var estimatedRankBot = table[table.length-2][1] + (ratioBot * (table[table.length-1][1] - table[table.length-2][1])); 
+    return Math.round(estimatedRankBot); 
+  }
+  
+  // درون‌یابی دقیق بین نقاط
+  for(var k=0;k<table.length-1;k++){ 
+    var hi = table[k], lo = table[k+1]; 
+    if(taraz <= hi[0] && taraz >= lo[0]){ 
+      var ratio = (hi[0] - taraz) / (hi[0] - lo[0]); 
+      var estRank = hi[1] + ratio * (lo[1] - hi[1]); 
+      
+      // تضمین نهایی: اگر تراز در محدوده بود، رتبه نباید از رتبه بالاترش (hi[1]) بدتر باشد
+      return Math.round(Math.max(estRank, hi[1])); 
+    } 
+  }
   return null;
 }
 
 function getTarazFromRank(rank, region) {
   var table = tarazRankTable[region];
-  if(rank < table[0][1]) { var ratioTop = (table[0][1] - rank) / (table[1][1] - table[0][1]); return Math.round(table[0][0] + ratioTop * (table[0][0] - table[1][0])); }
-  if(rank > table[table.length-1][1]) { var ratioBot = (rank - table[table.length-2][1]) / (table[table.length-1][1] - table[table.length-2][1]); return Math.round(table[table.length-2][0] - ratioBot * (table[table.length-2][0] - table[table.length-1][0])); }
+  if(rank <= table[0][1]) { var ratioTop = (table[0][1] - rank) / (table[1][1] - table[0][1]); return Math.round(table[0][0] + ratioTop * (table[0][0] - table[1][0])); }
+  if(rank >= table[table.length-1][1]) { var ratioBot = (rank - table[table.length-2][1]) / (table[table.length-1][1] - table[table.length-2][1]); return Math.round(table[table.length-2][0] - ratioBot * (table[table.length-2][0] - table[table.length-1][0])); }
   for(var i=0;i<table.length-1;i++){ var hi = table[i], lo = table[i+1]; if(rank >= hi[1] && rank <= lo[1]){ var ratio = (rank - hi[1]) / (lo[1] - hi[1]); return Math.round(hi[0] + ratio * (lo[0] - hi[0])); } }
   return null;
 }
