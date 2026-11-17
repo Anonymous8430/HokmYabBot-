@@ -124,7 +124,6 @@
 </script>
 
 <script>
-// 🔴 دیتابیس دانشگاه‌ها
 var unisData = {
   "1": {
     medicine: [
@@ -321,7 +320,6 @@ var unisData = {
   }
 };
 
-// 🔴 جداول تبدیل تراز به رتبه (مرتب‌سازی دقیق نزولی بر اساس تراز)
 var tarazRankTable = {
   "1": [ 
     [11021, 56], [10705, 158], [10415, 315], [10250, 468], [10193, 500], 
@@ -351,6 +349,17 @@ var tarazRankTable = {
     [8564, 7021], [8530, 7314], [8276, 9800], [7871, 14497] 
   ]
 };
+
+// 🔴 داده‌های واقعی شما برای درون‌یابی مستقیم
+var realData = [
+  {avg: 28, taraz: 7395}, {avg: 36, taraz: 8008}, {avg: 37, taraz: 8536},
+  {avg: 42, taraz: 8709}, {avg: 42.5, taraz: 8931}, {avg: 43, taraz: 9122},
+  {avg: 44, taraz: 9172}, {avg: 44, taraz: 9621}, {avg: 45, taraz: 9459},
+  {avg: 46, taraz: 9907}, {avg: 47, taraz: 9030}, {avg: 49, taraz: 9947},
+  {avg: 51, taraz: 10382}, {avg: 58, taraz: 11819}, {avg: 66, taraz: 13240}
+];
+// مرتب‌سازی بر اساس میانگین
+realData.sort((a,b) => a.avg - b.avg);
 
 var majorNames = {
   medicine: 'پزشکی', dental: 'دندان‌پزشکی', pharmacy: 'داروسازی', nursing: 'پرستاری', midwifery: 'مامایی', surgery: 'اتاق عمل', anesthesia: 'هوشبری', lab: 'علوم آزمایشگاهی', physio: 'فیزیوتراپی', optometry: 'بینایی‌سنجی'
@@ -396,24 +405,38 @@ function switchMode(mode) {
   else { document.getElementById('percentForm').style.display = 'block'; document.getElementById('directForm').style.display = 'none'; }
 }
 
+// 🔴 تابع جدید: محاسبه تراز به روش درون‌یابی مستقیم
 function calcPercent(){
   var region = document.getElementById('regionSelect').value;
   
-  var w = [2.8, 1.8, 2.1, 1.7]; 
-  var sumW = 0;
-  for(var j=0;j<4;j++) sumW += w[j];
-  var avgs = [48, 48, 40, 32]; 
-  var baseTaraz = 9800; 
-  var K = 90;
-
-  var wp = 0, wa = 0;
-  for(var i=0;i<4;i++){
+  // محاسبه میانگین وزنی با ضرایب واقعی
+  var coefs = [12, 7, 9, 7];
+  var sumW = 35;
+  var weightedSum = 0;
+  
+  for(var i=0; i<4; i++){
     var v = parseFloat(document.getElementById('d'+(i+1)).value);
     var p = isNaN(v) ? 0 : Math.max(0, Math.min(100, v));
-    wp += p * w[i]; wa += avgs[i] * w[i];
+    weightedSum += p * coefs[i];
   }
-  wp /= sumW; wa /= sumW;
-  var taraz = baseTaraz + (wp - wa) * K;
+  var avgPercent = weightedSum / sumW;
+  
+  // پیدا کردن جایگاه در داده‌های واقعی
+  var taraz = null;
+  if(avgPercent <= realData[0].avg) {
+    taraz = realData[0].taraz;
+  } else if(avgPercent >= realData[realData.length-1].avg) {
+    taraz = realData[realData.length-1].taraz;
+  } else {
+    for(var k=0; k<realData.length-1; k++){
+      var lo = realData[k], hi = realData[k+1];
+      if(avgPercent >= lo.avg && avgPercent <= hi.avg){
+        var ratio = (avgPercent - lo.avg) / (hi.avg - lo.avg);
+        taraz = lo.taraz + ratio * (hi.taraz - lo.taraz);
+        break;
+      }
+    }
+  }
   
   var rank = getRankFromTaraz(taraz, region);
   showResult(taraz, rank, region);
@@ -430,33 +453,11 @@ function calcDirect(){
   showResult(taraz, rank, region);
 }
 
-// تابع اصلاح‌شده: تضمین میکند رتبه خروجی همیشه با روند نزولی تراز همخوانی داشته باشد
 function getRankFromTaraz(taraz, region) {
   var table = tarazRankTable[region];
-  
-  // جلوگیری از خروج از محدوده
-  if(taraz >= table[0][0]) { 
-    var ratioTop = (taraz - table[0][0]) / (table[0][0] - table[1][0]); 
-    var estimatedRank = table[0][1] - (ratioTop * (table[1][1] - table[0][1])); 
-    return Math.max(1, Math.round(estimatedRank)); 
-  }
-  if(taraz <= table[table.length-1][0]) { 
-    var ratioBot = (table[table.length-2][0] - taraz) / (table[table.length-2][0] - table[table.length-1][0]); 
-    var estimatedRankBot = table[table.length-2][1] + (ratioBot * (table[table.length-1][1] - table[table.length-2][1])); 
-    return Math.round(estimatedRankBot); 
-  }
-  
-  // درون‌یابی دقیق بین نقاط
-  for(var k=0;k<table.length-1;k++){ 
-    var hi = table[k], lo = table[k+1]; 
-    if(taraz <= hi[0] && taraz >= lo[0]){ 
-      var ratio = (hi[0] - taraz) / (hi[0] - lo[0]); 
-      var estRank = hi[1] + ratio * (lo[1] - hi[1]); 
-      
-      // تضمین نهایی: اگر تراز در محدوده بود، رتبه نباید از رتبه بالاترش (hi[1]) بدتر باشد
-      return Math.round(Math.max(estRank, hi[1])); 
-    } 
-  }
+  if(taraz >= table[0][0]) { var ratioTop = (taraz - table[0][0]) / (table[0][0] - table[1][0]); var estimatedRank = table[0][1] - (ratioTop * (table[1][1] - table[0][1])); return Math.max(1, Math.round(estimatedRank)); }
+  if(taraz <= table[table.length-1][0]) { var ratioBot = (table[table.length-2][0] - taraz) / (table[table.length-2][0] - table[table.length-1][0]); var estimatedRankBot = table[table.length-2][1] + (ratioBot * (table[table.length-1][1] - table[table.length-2][1])); return Math.round(estimatedRankBot); }
+  for(var k=0;k<table.length-1;k++){ var hi = table[k], lo = table[k+1]; if(taraz <= hi[0] && taraz >= lo[0]){ var ratio = (hi[0]-taraz)/(hi[0]-lo[0]); return Math.round(hi[1] + ratio*(lo[1]-hi[1])); } }
   return null;
 }
 
