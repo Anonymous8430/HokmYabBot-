@@ -526,49 +526,49 @@ async function searchChannel() {
   var query = input.value.trim();
 
   if (!query) {
-    status.textContent = "اول عبارت یا سوال خودت رو بنویس";
+    status.textContent = "لطفاً سوال یا عبارت خود را بنویسید.";
     return;
   }
 
-  status.textContent = "در حال تحلیل هوشمند...";
+  status.textContent = "در حال تحلیل هوشمند (ممکن است چند ثانیه طول بکشد)...";
   results.innerHTML = "";
 
   try {
-    var res = await fetch(
-      "https://hokm-akhar-api.tryder2030.workers.dev/search?q=" + encodeURIComponent(query)
-    );
-    if (!res.ok) throw new Error("Server error " + res.status);
+    var res = await fetch("https://hokm-akhar-api.tryder2030.workers.dev/search?q=" + encodeURIComponent(query));
     var data = await res.json();
     
-    var posts = Array.isArray(data.results) ? data.results : [];
-
-    if (posts.length === 0) {
-      status.textContent = "چیزی پیدا نشد. عبارت یا سوال دیگری امتحان کن.";
-      return;
+    if (!res.ok) {
+       status.innerHTML = "خطای سرور: " + (data.message || data.error || "ناشناخته");
+       return;
     }
 
-    // اگر هوش مصنوعی جواب داده بود، اول اون رو نمایش بده
+    var posts = Array.isArray(data.results) ? data.results : [];
+
     if (data.isAI && data.aiAnswer) {
       var aiBox = document.createElement("div");
       aiBox.className = "ai-answer-box";
       aiBox.innerHTML = "🤖 <b>مشاور هوشمند حکم آخر:</b><br><br>" + data.aiAnswer;
       results.appendChild(aiBox);
       
-      var sep = document.createElement("div");
-      sep.style.cssText = "text-align:center; margin: 15px 0; font-size:12px; color:rgba(255,255,255,0.6);";
-      sep.innerHTML = "🔗 پست‌های مرتبط در کانال:";
-      results.appendChild(sep);
-      
+      if(posts.length > 0) {
+          var sep = document.createElement("div");
+          sep.style.cssText = "text-align:center; margin: 15px 0; font-size:12px; color:rgba(255,255,255,0.6);";
+          sep.innerHTML = "🔗 پست‌های مرتبط در کانال:";
+          results.appendChild(sep);
+          renderChannelResults(posts, query);
+      }
       status.textContent = "پاسخ هوش مصنوعی آماده شد.";
     } else {
+      if (posts.length === 0) {
+        status.textContent = "هیچ پستی پیدا نشد.";
+        return;
+      }
       status.textContent = posts.length.toLocaleString("fa-IR") + " نتیجه مرتبط پیدا شد";
+      renderChannelResults(posts, query);
     }
 
-    renderChannelResults(posts, query);
-
   } catch (err) {
-    console.error("Channel search error:", err);
-    status.textContent = "ارتباط با سرور برقرار نشد؛ دوباره تلاش کن";
+    status.textContent = "خطای شبکه: " + err.message;
   }
 }
 
@@ -634,4 +634,4 @@ function renderChannelResults(posts, query) {
 }
 </script>
 </body>
-  </html>
+</html>
