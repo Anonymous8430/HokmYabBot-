@@ -350,13 +350,23 @@ var tarazRankTable = {
   ]
 };
 
-// 🔴 داده‌های واقعی شما برای درون‌یابی مستقیم
+// 🔴 داده‌های واقعی شما (میانگین ساده به جای وزنی)
 var realData = [
-  {avg: 28, taraz: 7395}, {avg: 36, taraz: 8008}, {avg: 37, taraz: 8536},
-  {avg: 42, taraz: 8709}, {avg: 42.5, taraz: 8931}, {avg: 43, taraz: 9122},
-  {avg: 44, taraz: 9172}, {avg: 44, taraz: 9621}, {avg: 45, taraz: 9459},
-  {avg: 46, taraz: 9907}, {avg: 47, taraz: 9030}, {avg: 49, taraz: 9947},
-  {avg: 51, taraz: 10382}, {avg: 58, taraz: 11819}, {avg: 66, taraz: 13240}
+  {avg: (39+36+27+45)/4, taraz: 8709},
+  {avg: (40+21+12+7)/4, taraz: 7395},
+  {avg: (54+58+46+41)/4, taraz: 9947},
+  {avg: (65+57+50+40)/4, taraz: 10382},
+  {avg: (82+91+93+82)/4, taraz: 13240},
+  {avg: (70+85+77+63)/4, taraz: 11819},
+  {avg: (65+54+20+43)/4, taraz: 9621},
+  {avg: (61+44+43+41)/4, taraz: 9907},
+  {avg: (49+49+43+33)/4, taraz: 9459},
+  {avg: (46+32+52+22)/4, taraz: 9172},
+  {avg: (34+48+37+43)/4, taraz: 8931},
+  {avg: (51+37+44+20)/4, taraz: 9030},
+  {avg: (45+28+52+15)/4, taraz: 9122},
+  {avg: (31+28+26+18)/4, taraz: 8008},
+  {avg: (33+60+22+37)/4, taraz: 8536}
 ];
 // مرتب‌سازی بر اساس میانگین
 realData.sort((a,b) => a.avg - b.avg);
@@ -405,21 +415,18 @@ function switchMode(mode) {
   else { document.getElementById('percentForm').style.display = 'block'; document.getElementById('directForm').style.display = 'none'; }
 }
 
-// 🔴 تابع جدید: محاسبه تراز به روش درون‌یابی مستقیم
+// 🔴 تابع اصلاح‌شده: استفاده از میانگین ساده برای درون‌یابی
 function calcPercent(){
   var region = document.getElementById('regionSelect').value;
   
-  // محاسبه میانگین وزنی با ضرایب واقعی
-  var coefs = [12, 7, 9, 7];
-  var sumW = 35;
-  var weightedSum = 0;
-  
+  // محاسبه میانگین ساده (بدون ضریب)
+  var sum = 0;
   for(var i=0; i<4; i++){
     var v = parseFloat(document.getElementById('d'+(i+1)).value);
     var p = isNaN(v) ? 0 : Math.max(0, Math.min(100, v));
-    weightedSum += p * coefs[i];
+    sum += p;
   }
-  var avgPercent = weightedSum / sumW;
+  var avgPercent = sum / 4;
   
   // پیدا کردن جایگاه در داده‌های واقعی
   var taraz = null;
