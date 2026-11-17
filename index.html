@@ -52,6 +52,7 @@
   .major-separator { margin-top: 25px; margin-bottom: 10px; border-bottom: 2px dashed rgba(0, 210, 255, 0.4); padding-bottom: 5px; text-align: center; font-weight: bold; color: #00d2ff; font-size: 16px; }
   .channel { text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.2); font-size: 13px; }
   .channel a { color: #00d2ff; text-decoration: none; font-weight: bold; text-shadow: 0 0 10px rgba(0,210,255,0.5); }
+  .ai-answer-box { background: linear-gradient(135deg, rgba(0, 210, 255, 0.15), rgba(58, 123, 213, 0.15)); border: 1px solid #00d2ff; border-radius: 12px; padding: 15px; margin-bottom: 20px; line-height: 2; font-size: 14px; white-space: pre-wrap; box-shadow: 0 0 15px rgba(0,210,255,0.2); }
 </style>
 </head>
 <body>
@@ -60,13 +61,12 @@
   <div class="sub">آخرین رتبه‌های ۴۰۴ (تمام رشته‌ها)</div>
 
   <div style="margin:20px 0;padding:15px;background:rgba(0,0,0,.2);border:1px solid rgba(0,210,255,.25);border-radius:15px">
-    <h3 style="color:#00d2ff;text-align:center;margin-bottom:12px">🃏 جست‌وجوی هوشمند حُکم آخر</h3>
-    <input id="channelSearch" class="search-box" type="text" placeholder="موضوع یا کلمه موردنظر را بنویس...">
-    <button type="button" onclick="searchChannel()" style="margin-top:5px">جست‌وجو در پست‌های کانال</button>
-    <div id="channelStatus" style="text-align:center;margin-top:12px;font-size:13px"></div>
+    <h3 style="color:#00d2ff;text-align:center;margin-bottom:12px">🃏 دستیار هوشمند</h3>
+    <input id="channelSearch" class="search-box" type="text" placeholder="چطوری هِناسم؟ (سوال بپرس یا کلمه کلیدی بنویس...)">
+    <button type="button" onclick="searchChannel()" style="margin-top:5px">جست‌وجو / مشاوره هوشمند</button>
+    <div id="channelStatus" style="text-align:center;margin-top:12px;font-size:13px;color:#a3e4d7;"></div>
     <div id="channelResults" style="margin-top:12px"></div>
   </div>
-
 
   <input type="text" id="searchInput" class="search-box" placeholder="🔍 جستجوی نام شهر..." onkeyup="searchUniversities()">
 
@@ -520,82 +520,112 @@ function showResult(taraz, rank, region) {
 }
 
 async function searchChannel() {
-  const input = document.getElementById('channelSearch');
-  const status = document.getElementById('channelStatus');
-  const results = document.getElementById('channelResults');
-  const query = input.value.trim();
+  var input = document.getElementById("channelSearch");
+  var status = document.getElementById("channelStatus");
+  var results = document.getElementById("channelResults");
+  var query = input.value.trim();
 
   if (!query) {
-    status.textContent = 'اول عبارت جست‌وجو را وارد کن';
+    status.textContent = "اول عبارت یا سوال خودت رو بنویس";
     return;
   }
 
-  status.textContent = 'در حال جست‌وجو و تحلیل معنایی...';
-  results.innerHTML = '';
+  status.textContent = "در حال تحلیل هوشمند...";
+  results.innerHTML = "";
 
   try {
-    const url = 'https://hokm-akhar-api.tryder2030.workers.dev/search?q=' + encodeURIComponent(query);
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Server error: ' + response.status);
-
-    const data = await response.json();
-    const posts = Array.isArray(data.results) ? data.results : [];
+    var res = await fetch(
+      "https://hokm-akhar-api.tryder2030.workers.dev/search?q=" + encodeURIComponent(query)
+    );
+    if (!res.ok) throw new Error("Server error " + res.status);
+    var data = await res.json();
+    
+    var posts = Array.isArray(data.results) ? data.results : [];
 
     if (posts.length === 0) {
-      status.textContent = 'هیچ پستی با این مفهوم پیدا نشد. عبارت دیگری را امتحان کنید.';
+      status.textContent = "چیزی پیدا نشد. عبارت یا سوال دیگری امتحان کن.";
       return;
     }
 
-    status.textContent = posts.length.toLocaleString('fa-IR') + ' نتیجه مرتبط پیدا شد';
+    // اگر هوش مصنوعی جواب داده بود، اول اون رو نمایش بده
+    if (data.isAI && data.aiAnswer) {
+      var aiBox = document.createElement("div");
+      aiBox.className = "ai-answer-box";
+      aiBox.innerHTML = "🤖 <b>مشاور هوشمند حکم آخر:</b><br><br>" + data.aiAnswer;
+      results.appendChild(aiBox);
+      
+      var sep = document.createElement("div");
+      sep.style.cssText = "text-align:center; margin: 15px 0; font-size:12px; color:rgba(255,255,255,0.6);";
+      sep.innerHTML = "🔗 پست‌های مرتبط در کانال:";
+      results.appendChild(sep);
+      
+      status.textContent = "پاسخ هوش مصنوعی آماده شد.";
+    } else {
+      status.textContent = posts.length.toLocaleString("fa-IR") + " نتیجه مرتبط پیدا شد";
+    }
+
     renderChannelResults(posts, query);
 
-  } catch (error) {
-    console.error('Channel search error:', error);
-    status.textContent = 'ارتباط با سرور برقرار نشد؛ دوباره تلاش کن';
+  } catch (err) {
+    console.error("Channel search error:", err);
+    status.textContent = "ارتباط با سرور برقرار نشد؛ دوباره تلاش کن";
   }
 }
 
 function renderChannelResults(posts, query) {
-  const results = document.getElementById('channelResults');
-  results.innerHTML = '';
+  var results = document.getElementById("channelResults");
 
-  posts.forEach(post => {
-    const card = document.createElement('div');
-    card.style.cssText = 'padding:14px;margin:10px 0;background:rgba(255,255,255,.07);border-radius:12px;border-right:3px solid #00d2ff';
+  posts.forEach(function (post) {
+    var card = document.createElement("div");
+    card.style.cssText = "padding:14px;margin:10px 0;background:rgba(255,255,255,.07);border-radius:12px;border-right:3px solid #00d2ff";
 
-    // نمایش درصد ارتباط (فقط برای جست‌وجوی کانال)
     if (post.relevance !== undefined) {
-      const relBar = document.createElement('div');
-      relBar.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:11px;color:#a3e4d7;';
-      relBar.innerHTML = `
-        <div style="flex:1;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;">
-          <div style="height:100%;width:${post.relevance}%;background:#00d2ff;"></div>
-        </div>
-        <span>ارتباط: ${post.relevance}٪</span>
-      `;
-      card.appendChild(relBar);
+      var relWrap = document.createElement("div");
+      relWrap.style.cssText = "display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;color:rgba(255,255,255,.75)";
+      var barOuter = document.createElement("div");
+      barOuter.style.cssText = "flex:1;height:6px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden";
+      var barInner = document.createElement("div");
+      barInner.style.cssText = "height:100%;width:" + post.relevance + "%;background:linear-gradient(90deg,#00d2ff,#3a7bd5)";
+      barOuter.appendChild(barInner);
+      var relText = document.createElement("span");
+      relText.textContent = "ارتباط: " + post.relevance + "٪";
+      relWrap.appendChild(barOuter);
+      relWrap.appendChild(relText);
+      card.appendChild(relWrap);
     }
 
-    const content = document.createElement('p');
-    content.style.cssText = 'font-size:13px;line-height:2;white-space:pre-wrap;overflow-wrap:anywhere;margin:0;';
-    content.textContent = post.post_text || 'متن این پست موجود نیست';
+    var content = document.createElement("p");
+    content.style.cssText = "font-size:13px;line-height:2;white-space:pre-wrap;overflow-wrap:anywhere";
+    var text = post.post_text || "متن این پست موجود نیست";
+    var safe = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    var parts = text.split(new RegExp("(" + safe + ")", "gi"));
+    parts.forEach(function (part) {
+      if (part.toLowerCase() === query.toLowerCase()) {
+        var mark = document.createElement("mark");
+        mark.style.cssText = "background:#00d2ff33;color:#00d2ff;border-radius:3px";
+        mark.textContent = part;
+        content.appendChild(mark);
+      } else {
+        content.appendChild(document.createTextNode(part));
+      }
+    });
     card.appendChild(content);
 
     if (post.post_date) {
-      const date = document.createElement('small');
-      date.style.cssText = 'display:block;margin-top:8px;color:rgba(255,255,255,.5);direction:ltr;text-align:right';
-      const parsedDate = new Date(post.post_date);
-      date.textContent = isNaN(parsedDate.getTime()) ? '' : parsedDate.toLocaleString('fa-IR');
+      var date = document.createElement("small");
+      date.style.cssText = "display:block;margin-top:8px;color:rgba(255,255,255,.6);direction:ltr;text-align:right";
+      var pd = new Date(post.post_date);
+      date.textContent = isNaN(pd.getTime()) ? "" : pd.toLocaleString("fa-IR");
       card.appendChild(date);
     }
 
     if (post.post_link && /^https:\/\/t\.me\//.test(post.post_link)) {
-      const link = document.createElement('a');
+      var link = document.createElement("a");
       link.href = post.post_link;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      link.textContent = 'مشاهده پست در تلگرام ←';
-      link.style.cssText = 'display:block;margin-top:10px;color:#00d2ff;text-decoration:none;font-size:12px;';
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "مشاهده پست در تلگرام ←";
+      link.style.cssText = "display:block;margin-top:10px;color:#00d2ff;text-decoration:none;font-size:12px;";
       card.appendChild(link);
     }
 
@@ -604,4 +634,4 @@ function renderChannelResults(posts, query) {
 }
 </script>
 </body>
-</html>
+  </html>
