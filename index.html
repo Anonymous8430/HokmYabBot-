@@ -1,4 +1,5 @@
-<!DOCTYPE html>  <html lang="fa" dir="rtl">  
+<!DOCTYPE html>  
+<html lang="fa" dir="rtl">  
 <head>  
 <meta charset="UTF-8">  
 <meta name="viewport" content="width=device-width, initial-scale=1.0">  
@@ -339,7 +340,61 @@ var tarazRankTable = {
     [8564, 7021], [8530, 7314], [8276, 9800], [7871, 14497]   
   ]  
 };  
-  
+
+// ===== تابع پاکسازی داده‌های متناقض تراز-رتبه =====
+function cleanTarazRankTable(table) {
+  var cleaned = {};
+  var removedLog = [];
+
+  Object.keys(table).forEach(function(region) {
+    var data = table[region];
+    // مرتب‌سازی بر اساس تراز نزولی (تراز بالاتر اول)
+    var sorted = data.slice().sort(function(a, b) { return b[0] - a[0]; });
+
+    var result = [];
+    for (var i = 0; i < sorted.length; i++) {
+      var current = sorted[i];
+      var conflict = false;
+
+      if (result.length > 0) {
+        var lastValid = result[result.length - 1];
+        // تراز بالاتر باید رتبه بهتر (عدد کمتر) داشته باشه
+        // اگه تراز کمتره ولی رتبه بهتره => تناقض
+        if (current[0] < lastValid[0] && current[1] < lastValid[1]) {
+          conflict = true;
+        }
+        // اگه تراز بالاتره ولی رتبه بدتره => تناقض
+        if (current[0] > lastValid[0] && current[1] > lastValid[1]) {
+          conflict = true;
+        }
+      }
+
+      if (conflict) {
+        removedLog.push({ region: region, taraz: current[0], rank: current[1] });
+      } else {
+        result.push(current);
+      }
+    }
+
+    cleaned[region] = result;
+  });
+
+  if (removedLog.length > 0) {
+    console.warn('⚠️ داده‌های متناقض حذف شدند:', removedLog);
+  } else {
+    console.log('✅ هیچ داده متناقضی یافت نشد.');
+  }
+
+  return cleaned;
+}
+
+tarazRankTable = cleanTarazRankTable(tarazRankTable);
+
+Object.keys(tarazRankTable).forEach(function(region) {
+  console.log('منطقه ' + region + ': ' + tarazRankTable[region].length + ' داده معتبر باقی ماند.');
+});
+// ===== پایان پاکسازی =====
+
 var realData = [  
   {avg: (39+36+27+45)/4, taraz: 8709},  
   {avg: (40+21+12+7)/4, taraz: 7395},  
@@ -614,4 +669,4 @@ function renderChannelResults(posts, query) {
   });  
 }  
 </script>  </body>  
-                                                     </html>
+</html>
