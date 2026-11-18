@@ -27,7 +27,7 @@
   button:active { transform: translateY(1px); }
   .switch-btn { background: transparent; color: #00d2ff; border: 1px solid #00d2ff; margin-top: 15px; padding: 12px; font-size: 14px; box-shadow: none; }
   .switch-btn:hover { background: rgba(0, 210, 255, 0.1); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
-  #directForm { display: none; }
+  #directForm, #gradesForm { display: none; }
   .radio-group { display: flex; justify-content: center; gap: 20px; margin-bottom: 15px; font-size: 14px; }
   .radio-group label { cursor: pointer; display: flex; align-items: center; gap: 5px; }
   .radio-group input[type="radio"] { accent-color: #00d2ff; transform: scale(1.2); }
@@ -52,21 +52,25 @@
   .major-separator { margin-top: 25px; margin-bottom: 10px; border-bottom: 2px dashed rgba(0, 210, 255, 0.4); padding-bottom: 5px; text-align: center; font-weight: bold; color: #00d2ff; font-size: 16px; }
   .channel { text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.2); font-size: 13px; }
   .channel a { color: #00d2ff; text-decoration: none; font-weight: bold; text-shadow: 0 0 10px rgba(0,210,255,0.5); }
+  .ai-answer-box { background: linear-gradient(135deg, rgba(0, 210, 255, 0.15), rgba(58, 123, 213, 0.15)); border: 1px solid #00d2ff; border-radius: 12px; padding: 15px; margin-bottom: 20px; line-height: 2; font-size: 14px; white-space: pre-wrap; box-shadow: 0 0 15px rgba(0,210,255,0.2); }
+  .grade-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+  .grade-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+  .grade-item label { font-size: 13px; }
+  .grade-item input { width: 60px; padding: 5px; text-align: center; border-radius: 5px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; }
 </style>
 </head>
 <body>
 <div class="box">
   <h1>🧮 تراز، رتبه و دانشگاه‌ها</h1>
-  <div class="sub">تخمین تراز سوابق دوازدهم و آخرین رتبه‌های ۴۰۴</div>
+  <div class="sub">آخرین رتبه‌های ۴۰۴ (تمام رشته‌ها)</div>
 
   <div style="margin:20px 0;padding:15px;background:rgba(0,0,0,.2);border:1px solid rgba(0,210,255,.25);border-radius:15px">
-    <h3 style="color:#00d2ff;text-align:center;margin-bottom:12px">🃏 جست‌وجوی هوشمند حُکم آخر</h3>
-    <input id="channelSearch" class="search-box" type="text" placeholder="موضوع یا کلمه موردنظر را بنویس...">
-    <button type="button" onclick="searchChannel()" style="margin-top:5px">جست‌وجو در پست‌های کانال</button>
-    <div id="channelStatus" style="text-align:center;margin-top:12px;font-size:13px"></div>
+    <h3 style="color:#00d2ff;text-align:center;margin-bottom:12px">🃏 دستیار هوشمند</h3>
+    <input id="channelSearch" class="search-box" type="text" placeholder="چطوری هِناسم؟ (سوال بپرس یا کلمه کلیدی بنویس...)">
+    <button type="button" onclick="searchChannel()" style="margin-top:5px">جست‌وجو / مشاوره هوشمند</button>
+    <div id="channelStatus" style="text-align:center;margin-top:12px;font-size:13px;color:#a3e4d7;"></div>
     <div id="channelResults" style="margin-top:12px"></div>
   </div>
-
 
   <input type="text" id="searchInput" class="search-box" placeholder="🔍 جستجوی نام شهر..." onkeyup="searchUniversities()">
 
@@ -98,35 +102,7 @@
     <div class="row"><label>ریاضی</label><span class="coef">۷</span><input id="d4" type="number" placeholder="%"></div>
     <button onclick="calcPercent()">محاسبه تراز و رتبه</button>
     <button class="switch-btn" onclick="switchMode('direct')">رتبه یا تراز کل دارم، مستقیم وارد می‌کنم</button>
-  </div>
-
-
-  <div id="finalGradeForm" style="margin:22px 0;padding:16px;background:rgba(0,0,0,.22);border:1px solid rgba(0,210,255,.3);border-radius:16px">
-    <h3 style="color:#00d2ff;text-align:center;margin-bottom:8px">📘 تخمین تراز نهایی دوازدهم تجربی</h3>
-    <div style="font-size:11px;color:rgba(255,255,255,.65);text-align:center;line-height:1.9;margin-bottom:12px">نمره نهایی هر ۱۰ درس دوازدهم را وارد کن. مدل آزمایشی بر اساس ۹ نمونه کارنامه، تراز سوابق را تخمین می‌زند؛ سپس با تراز کنکور، ترکیب ۶۰/۴۰ می‌سازد.</div>
-    <div class="row"><label>دینی ۳</label><span class="coef">ضریب ۸٫۴۷</span><input id="g_dini" type="number" min="0" max="20" step="0.25" placeholder="۰ تا ۲۰"></div>
-    <div class="row"><label>عربی ۳</label><span class="coef">ضریب ۴٫۶۴</span><input id="g_arabi" type="number" min="0" max="20" step="0.25" placeholder="۰ تا ۲۰"></div>
-    <div class="row"><label>فارسی ۳</label><span class="coef">ضریب ۱۱٫۰۹</span><input id="g_farsi" type="number" min="0" max="20" step="0.25" placeholder="۰ تا ۲۰"></div>
-    <div class="row"><label>زبان خارجی ۳</label><span class="coef">ضریب ۶٫۰۵</span><input id="g_english" type="number" min="0" max="20" step="0.25" placeholder="۰ تا ۲۰"></div>
-    <div class="row"><label>شیمی ۳</label><span class="coef">ضریب ۹٫۱۹</span><input id="g_chem" type="number" min="0" max="20" step="0.25" placeholder="۰ تا ۲۰"></div>
-    <div class="row"><label>سلامت و بهداشت</label><span class="coef">ضریب ۱٫۷۶</span><input id="g_health" type="number" min="0" max="20" step="0.25" placeholder="۰ تا ۲۰"></div>
-    <div class="row"><label>علوم اجتماعی</label><span class="coef">ضریب ۱٫۳۱</span><input id="g_social" type="number" min="0" max="20" step="0.25" placeholder="۰ تا ۲۰"></div>
-    <div class="row"><label>زیست‌شناسی ۳</label><span class="coef">ضریب ۱۰٫۶۶</span><input id="g_bio" type="number" min="0" max="20" step="0.25" placeholder="۰ تا ۲۰"></div>
-    <div class="row"><label>ریاضی ۳</label><span class="coef">ضریب ۱۰٫۰۴</span><input id="g_math" type="number" min="0" max="20" step="0.25" placeholder="۰ تا ۲۰"></div>
-    <div class="row"><label>فیزیک ۳</label><span class="coef">ضریب ۸٫۴۵</span><input id="g_physics" type="number" min="0" max="20" step="0.25" placeholder="۰ تا ۲۰"></div>
-    <div class="row"><label>تراز کنکور اختصاصی</label><span class="coef">۴۰٪</span><input id="entranceTarazInput" type="number" min="0" max="20000" step="1" placeholder="تراز کنکور را وارد کن"></div>
-    <button type="button" onclick="estimateFinalGradeTaraz()">محاسبه تراز سوابق و تراز کل ۶۰/۴۰</button>
-    <div id="finalGradeResult" style="display:none;margin-top:16px;padding:14px;background:rgba(0,0,0,.28);border-radius:12px;text-align:center;line-height:2.1">
-      <div style="font-size:12px;color:rgba(255,255,255,.7)">معدل وزنی با ضرایب دروس</div>
-      <div id="weightedGradeOut" style="font-size:22px;font-weight:bold;color:#fff"></div>
-      <div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:8px">تراز تخمینی سوابق دوازدهم</div>
-      <div id="finalGradeTarazOut" style="font-size:30px;font-weight:bold;color:#00d2ff"></div>
-      <div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:8px">تراز کل تخمینی (۶۰٪ سوابق + ۴۰٪ کنکور)</div>
-      <div id="combinedTarazOut" style="font-size:34px;font-weight:bold;color:#f6d365"></div>
-      <div id="nearestSampleOut" style="font-size:11px;color:rgba(255,255,255,.65);margin-top:6px"></div>
-      <div style="font-size:10px;color:#f6d365;margin-top:8px">مدل آزمایشی و غیررسمی است؛ فقط ۹ نمونه کارنامه دارد و جایگزین تراز رسمی سازمان سنجش نیست.</div>
-    </div>
-    <div style="font-size:10px;color:rgba(255,255,255,.55);line-height:1.8;margin-top:10px">معدل وزنی فقط میانگین نمرات با ضرایب درج‌شده در همین ابزار است و معادل تراز سوابق تحصیلی نیست. ضرایب باید با جدول رسمی همان سال تطبیق داده شوند.</div>
+    <button class="switch-btn" onclick="switchMode('grades')" style="color:#f1c40f; border-color:#f1c40f; margin-top:10px;">محاسبه با نمرات نهایی (تاثیر ۶۰٪ معدل)</button>
   </div>
 
   <div id="directForm">
@@ -142,11 +118,35 @@
     <button class="switch-btn" onclick="switchMode('percent')">بازگشت به درصدها</button>
   </div>
 
+  <!-- بخش جدید: فرم نمرات نهایی -->
+  <div id="gradesForm">
+    <h3 style="color:#00d2ff; text-align:center; margin-bottom:15px; font-size:15px;">نمرات نهایی (از ۲۰)</h3>
+    <div class="grade-grid">
+      <div class="grade-item"><label>زیست</label><input id="g_biology" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>ریاضی</label><input id="g_math" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>فیزیک</label><input id="g_physics" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>شیمی</label><input id="g_chemistry" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>فارسی</label><input id="g_persian" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>عربی</label><input id="g_arabic" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>دینی</label><input id="g_religion" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>زبان</label><input id="g_english" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>اجتماعی</label><input id="g_social" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>سلامت</label><input id="g_health" type="number" step="0.25" placeholder="20"></div>
+    </div>
+    <div style="margin-bottom:15px;">
+      <label style="font-size:13px; display:block; margin-bottom:5px;">تراز اختصاصی کنکور (۴۰٪):</label>
+      <input id="exam_taraz" type="number" placeholder="مثلا 7903" style="width:100%; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.2); color:#fff; text-align:center;">
+    </div>
+    <button onclick="calcGrades()">محاسبه تراز کل و دانشگاه</button>
+    <button class="switch-btn" onclick="switchMode('percent')">بازگشت به درصدها</button>
+  </div>
+
   <div class="result" id="res">
     <div id="searchResultsContainer"></div>
     <div id="calcResultsContainer">
-      <div class="item">تراز: <span class="big" id="outTaraz">0</span></div>
-      <div class="item">رتبه: <span class="rank" id="outRank">-</span></div>
+      <div class="item">تراز نهایی (کل): <span class="big" id="outTaraz">0</span></div>
+      <div class="item">رتبه تقریبی: <span class="rank" id="outRank">-</span></div>
+      <div id="calcBreakdown" style="font-size:12px; text-align:center; color:#aaa; margin-top:10px; display:none;"></div>
       <div class="unis" id="uniResults"></div>
     </div>
   </div>
@@ -359,36 +359,71 @@ var unisData = {
 };
 
 var tarazRankTable = {
-  "1": [ 
-    [11021, 56], [10705, 158], [10415, 315], [10250, 468], [10193, 500], 
-    [10188, 533], [10110, 411], [10051, 716], [9959, 872], [9879, 1023], 
-    [9832, 640], [9828, 1131], [9798, 1182], [9737, 808], [9688, 1465], 
-    [9686, 1472], [9683, 1481], [9658, 991], [9653, 1007], [9631, 1060], 
-    [9605, 1131], [9572, 1241], [9524, 1383], [9454, 1587], [9451, 1603], 
-    [9443, 2269], [9414, 1746], [9361, 1963], [9356, 1986], [9328, 2095], 
-    [9279, 2296], [9274, 2320], [9207, 2638], [9076, 3812], [9070, 3322], 
-    [8897, 4756], [8696, 5906], [8578, 6691], [8564, 7021], [8530, 7314], 
-    [8287, 8699], [8276, 9800], [7871, 14497] 
+  "1": [
+    [11021, 56], [10705, 158], [10415, 315], [10250, 468], [10193, 500],
+    [10188, 533], [10110, 411], [10051, 716], [9959, 872], [9879, 1023],
+    [9832, 640], [9828, 1131], [9798, 1182], [9737, 808], [9688, 1465],
+    [9686, 1472], [9683, 1481], [9658, 991], [9653, 1007], [9631, 1060],
+    [9605, 1131], [9572, 1241], [9524, 1383], [9454, 1587], [9451, 1603],
+    [9443, 2269], [9414, 1746], [9361, 1963], [9356, 1986], [9328, 2095],
+    [9279, 2296], [9274, 2320], [9207, 2638], [9076, 3812], [9070, 3322],
+    [8897, 4756], [8696, 5906], [8578, 6691], [8564, 7021], [8530, 7314],
+    [8287, 8699], [8276, 9800], [7871, 14497]
   ],
-  "2": [ 
-    [11415, 14], [10915, 95], [10689, 203], [10582, 269], [10440, 397], 
-    [10421, 412], [10233, 601], [10203, 646], [10162, 703], [10112, 795], 
-    [10093, 827], [9893, 1253], [9788, 1567], [9774, 1619], [9758, 1670], 
-    [9736, 1748], [9505, 2726], [9359, 3564], [9267, 4133], [9207, 4523], 
-    [9144, 5005], [9032, 5886], [8790, 8145], [8779, 8267], [8588, 10274], 
-    [8592, 10215], [8224, 14481], [8251, 14132], [8103, 16100], [7223, 30048] 
+  "2": [
+    [11415, 14], [10915, 95], [10689, 203], [10582, 269], [10440, 397],
+    [10421, 412], [10233, 601], [10203, 646], [10162, 703], [10112, 795],
+    [10093, 827], [9893, 1253], [9788, 1567], [9774, 1619], [9758, 1670],
+    [9736, 1748], [9505, 2726], [9359, 3564], [9267, 4133], [9207, 4523],
+    [9144, 5005], [9032, 5886], [8790, 8145], [8779, 8267], [8588, 10274],
+    [8592, 10215], [8224, 14481], [8251, 14132], [8103, 16100], [7223, 30048]
   ],
-  "3": [ 
-    [10629, 60], [10560, 81], [10193, 239], [10110, 411], [10030, 387], 
-    [9832, 640], [9790, 697], [9737, 808], [9658, 991], [9653, 1007], 
-    [9631, 1060], [9605, 1131], [9572, 1241], [9524, 1383], [9454, 1587], 
-    [9451, 1603], [9414, 1746], [9361, 1963], [9356, 1986], [9328, 2095], 
-    [9279, 2296], [9274, 2320], [9207, 2638], [9070, 3322], [8696, 5906], 
-    [8564, 7021], [8530, 7314], [8276, 9800], [7871, 14497] 
+  "3": [
+    [10629, 60], [10560, 81], [10193, 239], [10110, 411], [10030, 387],
+    [9832, 640], [9790, 697], [9737, 808], [9658, 991], [9653, 1007],
+    [9631, 1060], [9605, 1131], [9572, 1241], [9524, 1383], [9454, 1587],
+    [9451, 1603], [9414, 1746], [9361, 1963], [9356, 1986], [9328, 2095],
+    [9279, 2296], [9274, 2320], [9207, 2638], [9070, 3322], [8696, 5906],
+    [8564, 7021], [8530, 7314], [8276, 9800], [7871, 14497]
   ]
 };
 
-// 🔴 داده‌های واقعی شما (میانگین ساده به جای وزنی)
+// ===== تابع پاکسازی داده‌های متناقض تراز-رتبه =====
+function cleanTarazRankTable(table) {
+  var cleaned = {};
+  var removedLog = [];
+
+  Object.keys(table).forEach(function(region) {
+    var data = table[region];
+    var sorted = data.slice().sort(function(a, b) { return b[0] - a[0]; });
+
+    var result = [];
+    for (var i = 0; i < sorted.length; i++) {
+      var current = sorted[i];
+      var conflict = false;
+
+      if (result.length > 0) {
+        var lastValid = result[result.length - 1];
+        if (current[0] < lastValid[0] && current[1] < lastValid[1]) conflict = true;
+        if (current[0] > lastValid[0] && current[1] > lastValid[1]) conflict = true;
+      }
+
+      if (conflict) {
+        removedLog.push({ region: region, taraz: current[0], rank: current[1] });
+      } else {
+        result.push(current);
+      }
+    }
+    cleaned[region] = result;
+  });
+
+  if (removedLog.length > 0) console.warn('⚠️ داده‌های متناقض حذف شدند:', removedLog);
+  return cleaned;
+}
+
+tarazRankTable = cleanTarazRankTable(tarazRankTable);
+// ===== پایان پاکسازی =====
+
 var realData = [
   {avg: (39+36+27+45)/4, taraz: 8709},
   {avg: (40+21+12+7)/4, taraz: 7395},
@@ -406,64 +441,11 @@ var realData = [
   {avg: (31+28+26+18)/4, taraz: 8008},
   {avg: (33+60+22+37)/4, taraz: 8536}
 ];
-// مرتب‌سازی بر اساس میانگین
 realData.sort((a,b) => a.avg - b.avg);
 
 var majorNames = {
   medicine: 'پزشکی', dental: 'دندان‌پزشکی', pharmacy: 'داروسازی', nursing: 'پرستاری', midwifery: 'مامایی', surgery: 'اتاق عمل', anesthesia: 'هوشبری', lab: 'علوم آزمایشگاهی', physio: 'فیزیوتراپی', optometry: 'بینایی‌سنجی'
 };
-
-
-// مدل آزمایشی دوازدهم: برازش خطی روی ۹ نمونه کارنامه‌ای که کاربر ارائه کرده است.
-// معدل وزنی با ضرایب درج‌شده محاسبه می‌شود؛ تراز کل طبق فرض کاربر ۶۰/۴۰ است.
-var finalGradeWeights = [8.47,4.64,11.09,6.05,9.19,1.76,1.31,10.66,10.04,8.45];
-var finalGradeSamples = [
-  {g:[19.75,19.5,19.5,20,20,19,19,20,19.5,20],t:10154},
-  {g:[20,19.25,18.75,20,19.75,17,18.5,19,18,18.5],t:8347},
-  {g:[20,19.5,19.75,19.75,19.75,18.75,19.5,19.75,20,19],t:9896},
-  {g:[17.5,15.5,17.75,7.75,18.25,14.5,18.5,18.25,18.25,19],t:7806},
-  {g:[20,19.5,20,20,19.5,19.25,19.75,19.25,19.75,19.5],t:9788},
-  {g:[20,18.5,19,19.75,19,16.75,19,19.5,20,19.75],t:9274},
-  {g:[19.5,19.25,20,20,19.5,14.75,18,19.5,20,19.75],t:9725},
-  {g:[19.5,19.5,20,19.75,19.25,15.5,19.5,18.75,20,19.75],t:9450},
-  {g:[20,20,20,20,20,20,20,20,20,20],t:10728}
-];
-function estimateFinalGradeTaraz(){
-  var ids=['g_dini','g_arabi','g_farsi','g_english','g_chem','g_health','g_social','g_bio','g_math','g_physics'];
-  var grades=[];
-  for(var i=0;i<ids.length;i++){
-    var el=document.getElementById(ids[i]);
-    var v=el && el.value.trim()!=='' ? Number(el.value) : NaN;
-    if(!Number.isFinite(v) || v<0 || v>20){alert('نمره همه ۱۰ درس دوازدهم را بین صفر تا ۲۰ وارد کن.'); if(el) el.focus(); return;}
-    grades.push(v);
-  }
-  var weightedSum=0, weightSum=0;
-  for(var w=0;w<grades.length;w++){weightedSum+=grades[w]*finalGradeWeights[w];weightSum+=finalGradeWeights[w];}
-  var weightedAvg=weightedSum/weightSum;
-  var x=[], y=[];
-  finalGradeSamples.forEach(function(sample){
-    var sw=0; for(var j=0;j<10;j++) sw+=sample.g[j]*finalGradeWeights[j];
-    x.push(sw/weightSum); y.push(sample.t);
-  });
-  var mx=x.reduce(function(a,b){return a+b;},0)/x.length;
-  var my=y.reduce(function(a,b){return a+b;},0)/y.length;
-  var cov=0, variance=0;
-  for(var k=0;k<x.length;k++){cov+=(x[k]-mx)*(y[k]-my);variance+=(x[k]-mx)*(x[k]-mx);}
-  var slope=variance ? cov/variance : 0;
-  var intercept=my-slope*mx;
-  var estimatedTaraz=Math.round(intercept+slope*weightedAvg);
-  estimatedTaraz=Math.max(5000,Math.min(12000,estimatedTaraz));
-  var examEl=document.getElementById('entranceTarazInput');
-  var examTaraz=examEl && examEl.value.trim()!=='' ? Number(examEl.value) : NaN;
-  var combinedOut=document.getElementById('combinedTarazOut');
-  var combinedText='برای محاسبه، تراز کنکور را وارد کن';
-  if(Number.isFinite(examTaraz) && examTaraz>=0 && examTaraz<=20000){combinedText=Math.round(estimatedTaraz*0.60+examTaraz*0.40).toLocaleString('en-US');}
-  document.getElementById('weightedGradeOut').textContent=weightedAvg.toFixed(3).replace('.', '٫');
-  document.getElementById('finalGradeTarazOut').textContent=estimatedTaraz.toLocaleString('en-US');
-  combinedOut.textContent=combinedText;
-  document.getElementById('nearestSampleOut').textContent='برازش خطی روی ۹ نمونه: تراز سوابق ≈ '+estimatedTaraz.toLocaleString('en-US')+' | خطای معمول مدل روی همین نمونه‌ها حدود ۴۰۰ تراز است؛ برای نمرات خارج از بازه نمونه‌ها دقت کمتر می‌شود.';
-  document.getElementById('finalGradeResult').style.display='block';
-}
 
 function searchUniversities() {
   var query = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -501,15 +483,17 @@ function clearResults() {
 
 function switchMode(mode) {
   clearResults();
-  if(mode === 'direct') { document.getElementById('percentForm').style.display = 'none'; document.getElementById('directForm').style.display = 'block'; } 
-  else { document.getElementById('percentForm').style.display = 'block'; document.getElementById('directForm').style.display = 'none'; }
+  document.getElementById('percentForm').style.display = 'none';
+  document.getElementById('directForm').style.display = 'none';
+  document.getElementById('gradesForm').style.display = 'none';
+  
+  if(mode === 'direct') document.getElementById('directForm').style.display = 'block';
+  else if(mode === 'grades') document.getElementById('gradesForm').style.display = 'block';
+  else document.getElementById('percentForm').style.display = 'block';
 }
 
-// 🔴 تابع اصلاح‌شده: استفاده از میانگین ساده برای درون‌یابی
 function calcPercent(){
   var region = document.getElementById('regionSelect').value;
-  
-  // محاسبه میانگین ساده (بدون ضریب)
   var sum = 0;
   for(var i=0; i<4; i++){
     var v = parseFloat(document.getElementById('d'+(i+1)).value);
@@ -517,14 +501,10 @@ function calcPercent(){
     sum += p;
   }
   var avgPercent = sum / 4;
-  
-  // پیدا کردن جایگاه در داده‌های واقعی
   var taraz = null;
-  if(avgPercent <= realData[0].avg) {
-    taraz = realData[0].taraz;
-  } else if(avgPercent >= realData[realData.length-1].avg) {
-    taraz = realData[realData.length-1].taraz;
-  } else {
+  if(avgPercent <= realData[0].avg) taraz = realData[0].taraz;
+  else if(avgPercent >= realData[realData.length-1].avg) taraz = realData[realData.length-1].taraz;
+  else {
     for(var k=0; k<realData.length-1; k++){
       var lo = realData[k], hi = realData[k+1];
       if(avgPercent >= lo.avg && avgPercent <= hi.avg){
@@ -534,9 +514,8 @@ function calcPercent(){
       }
     }
   }
-  
   var rank = getRankFromTaraz(taraz, region);
-  showResult(taraz, rank, region);
+  showResult(taraz, rank, region, null);
 }
 
 function calcDirect(){
@@ -545,108 +524,80 @@ function calcDirect(){
   var val = parseFloat(document.getElementById('directValue').value);
   if(isNaN(val)) { alert('لطفا یک عدد معتبر وارد کنید.'); return; }
   var taraz, rank;
-  if(type === 'taraz') { taraz = val; rank = getRankFromTaraz(taraz, region); } 
+  if(type === 'taraz') { taraz = val; rank = getRankFromTaraz(taraz, region); }
   else { rank = val; taraz = getTarazFromRank(rank, region); }
-  showResult(taraz, rank, region);
+  showResult(taraz, rank, region, null);
 }
 
-function getCleanTarazRankTable(region) {
-  var source = tarazRankTable[region];
-  if (!Array.isArray(source)) return [];
+// بخش جدید: محاسبه با نمرات نهایی و تاثیر ۶۰٪
+function calcGrades() {
+  var region = document.getElementById('regionSelect').value;
+  var grades = [
+    parseFloat(document.getElementById('g_biology').value) || 0,
+    parseFloat(document.getElementById('g_math').value) || 0,
+    parseFloat(document.getElementById('g_physics').value) || 0,
+    parseFloat(document.getElementById('g_chemistry').value) || 0,
+    parseFloat(document.getElementById('g_persian').value) || 0,
+    parseFloat(document.getElementById('g_arabic').value) || 0,
+    parseFloat(document.getElementById('g_religion').value) || 0,
+    parseFloat(document.getElementById('g_english').value) || 0,
+    parseFloat(document.getElementById('g_social').value) || 0,
+    parseFloat(document.getElementById('g_health').value) || 0
+  ];
 
-  // مرتب‌سازی تراز از بیشترین به کمترین و حذف داده‌های نامعتبر
-  var points = source
-    .filter(function(p) {
-      return Array.isArray(p) &&
-        Number.isFinite(Number(p[0])) &&
-        Number.isFinite(Number(p[1]));
-    })
-    .map(function(p) { return [Number(p[0]), Number(p[1])]; })
-    .sort(function(a, b) { return b[0] - a[0]; });
-
-  var n = points.length;
-  if (n < 2) return points;
-
-  // نگه‌داشتن طولانی‌ترین دنباله‌ای که با کاهش تراز، رتبه در آن افزایش می‌یابد
-  var dp = new Array(n).fill(1);
-  var previous = new Array(n).fill(-1);
-  var bestIndex = 0;
-
-  for (var i = 0; i < n; i++) {
-    for (var j = 0; j < i; j++) {
-      if (points[j][1] < points[i][1] && dp[j] + 1 > dp[i]) {
-        dp[i] = dp[j] + 1;
-        previous[i] = j;
-      }
-    }
-    if (dp[i] > dp[bestIndex]) bestIndex = i;
+  var sumGrades = 0;
+  var validGradesCount = 0;
+  for(var i=0; i<grades.length; i++) {
+    if(grades[i] > 0) { sumGrades += grades[i]; validGradesCount++; }
   }
 
-  var clean = [];
-  var index = bestIndex;
-  while (index !== -1) {
-    clean.push(points[index]);
-    index = previous[index];
-  }
+  if(validGradesCount === 0) { alert('حداقل یک نمره معتبر وارد کنید.'); return; }
 
-  return clean.reverse();
+  var avgGrade = sumGrades / validGradesCount;
+  
+  // تبدیل معدل به تراز سابقه تحصیلی (تخمین: معدل ۲۰ = تراز ۱۲۰۰۰، معدل ۱۰ = تراز ۶۰۰۰)
+  var schoolTaraz = 6000 + (avgGrade / 20) * 6000;
+
+  var examTaraz = parseFloat(document.getElementById('exam_taraz').value);
+  if(isNaN(examTaraz)) { examTaraz = 6000; } // مقدار پیش‌فرض
+
+  // فرمول جدید: ۶۰٪ سابقه تحصیلی + ۴۰٪ کنکور
+  var finalTaraz = (schoolTaraz * 0.6) + (examTaraz * 0.4);
+  
+  var rank = getRankFromTaraz(finalTaraz, region);
+  
+  var breakdown = 'معدل کتبی: ' + avgGrade.toFixed(2) + ' | تراز سابقه تحصیلی: ' + Math.round(schoolTaraz) + ' | تراز کنکور: ' + Math.round(examTaraz);
+  showResult(finalTaraz, rank, region, breakdown);
 }
 
 function getRankFromTaraz(taraz, region) {
-  var table = getCleanTarazRankTable(region);
-  if (table.length < 2 || !Number.isFinite(Number(taraz))) return null;
-  taraz = Number(taraz);
-
-  if (taraz >= table[0][0]) {
-    var ratioTop = (taraz - table[0][0]) / (table[0][0] - table[1][0]);
-    return Math.max(1, Math.round(table[0][1] - ratioTop * (table[1][1] - table[0][1])));
-  }
-
-  var last = table.length - 1;
-  if (taraz <= table[last][0]) {
-    var ratioBottom = (table[last - 1][0] - taraz) / (table[last - 1][0] - table[last][0]);
-    return Math.round(table[last - 1][1] + ratioBottom * (table[last][1] - table[last - 1][1]));
-  }
-
-  for (var k = 0; k < last; k++) {
-    var hi = table[k], lo = table[k + 1];
-    if (taraz <= hi[0] && taraz >= lo[0]) {
-      var ratio = (hi[0] - taraz) / (hi[0] - lo[0]);
-      return Math.round(hi[1] + ratio * (lo[1] - hi[1]));
-    }
-  }
+  var table = tarazRankTable[region];
+  if(taraz >= table[0][0]) { var ratioTop = (taraz - table[0][0]) / (table[0][0] - table[1][0]); var estimatedRank = table[0][1] - (ratioTop * (table[1][1] - table[0][1])); return Math.max(1, Math.round(estimatedRank)); }
+  if(taraz <= table[table.length-1][0]) { var ratioBot = (table[table.length-2][0] - taraz) / (table[table.length-2][0] - table[table.length-1][0]); var estimatedRankBot = table[table.length-2][1] + (ratioBot * (table[table.length-1][1] - table[table.length-2][1])); return Math.round(estimatedRankBot); }
+  for(var k=0;k<table.length-1;k++){ var hi = table[k], lo = table[k+1]; if(taraz <= hi[0] && taraz >= lo[0]){ var ratio = (hi[0]-taraz)/(hi[0]-lo[0]); return Math.round(hi[1] + ratio*(lo[1]-hi[1])); } }
   return null;
 }
 
 function getTarazFromRank(rank, region) {
-  var table = getCleanTarazRankTable(region);
-  if (table.length < 2 || !Number.isFinite(Number(rank))) return null;
-  rank = Number(rank);
-
-  if (rank <= table[0][1]) {
-    var ratioTop = (table[0][1] - rank) / (table[1][1] - table[0][1]);
-    return Math.round(table[0][0] + ratioTop * (table[0][0] - table[1][0]));
-  }
-
-  var last = table.length - 1;
-  if (rank >= table[last][1]) {
-    var ratioBottom = (rank - table[last - 1][1]) / (table[last][1] - table[last - 1][1]);
-    return Math.round(table[last - 1][0] - ratioBottom * (table[last - 1][0] - table[last][0]));
-  }
-
-  for (var i = 0; i < last; i++) {
-    var hi = table[i], lo = table[i + 1];
-    if (rank >= hi[1] && rank <= lo[1]) {
-      var ratio = (rank - hi[1]) / (lo[1] - hi[1]);
-      return Math.round(hi[0] + ratio * (lo[0] - hi[0]));
-    }
-  }
+  var table = tarazRankTable[region];
+  if(rank <= table[0][1]) { var ratioTop = (table[0][1] - rank) / (table[1][1] - table[0][1]); return Math.round(table[0][0] + ratioTop * (table[0][0] - table[1][0])); }
+  if(rank >= table[table.length-1][1]) { var ratioBot = (rank - table[table.length-2][1]) / (table[table.length-1][1] - table[table.length-2][1]); return Math.round(table[table.length-2][0] - ratioBot * (table[table.length-2][0] - table[table.length-1][0])); }
+  for(var i=0;i<table.length-1;i++){ var hi = table[i], lo = table[i+1]; if(rank >= hi[1] && rank <= lo[1]){ var ratio = (rank - hi[1]) / (lo[1] - hi[1]); return Math.round(hi[0] + ratio * (lo[0] - hi[0])); } }
   return null;
 }
 
-function showResult(taraz, rank, region) {
+function showResult(taraz, rank, region, breakdown) {
   document.getElementById('searchInput').value = ''; document.getElementById('searchResultsContainer').innerHTML = ''; document.getElementById('calcResultsContainer').style.display = 'block';
   document.getElementById('outTaraz').innerText = Math.round(taraz).toLocaleString('fa-IR'); document.getElementById('outRank').innerText = rank ? rank.toLocaleString('fa-IR') : '-';
+  
+  var breakdownDiv = document.getElementById('calcBreakdown');
+  if(breakdown) {
+    breakdownDiv.style.display = 'block';
+    breakdownDiv.innerText = breakdown;
+  } else {
+    breakdownDiv.style.display = 'none';
+  }
+
   var major = document.getElementById('majorSelect').value; var resDiv = document.getElementById('uniResults'); resDiv.innerHTML = '';
 
   if(major === 'all') {
@@ -674,80 +625,129 @@ function showResult(taraz, rank, region) {
       if(diff >= yesThreshold) yesList.push(item); else if(diff >= maybeThreshold && diff < yesThreshold) maybeList.push(item);
     }
     var yesHtml = '<h3>✅ ' + majorNames[major] + ' - شانس بالا</h3>';
-    if(yesList.length === 0){ yesHtml += '<div style="text-align:center;color:#aaa;font-size:12px;margin-bottom:10px;">دانشگاهی پیدا نشد.</div>'; } 
+    if(yesList.length === 0){ yesHtml += '<div style="text-align:center;color:#aaa;font-size:12px;margin-bottom:10px;">دانشگاهی پیدا نشد.</div>'; }
     else { for(var i=0; i<yesList.length; i++){ yesHtml += '<div class="uni-item uni-yes"><span class="name">' + yesList[i].name + ' <span class="uni-type">' + yesList[i].type + '</span></span><span class="last">آخرین: ' + yesList[i].last.toLocaleString('fa-IR') + '</span></div>'; } }
     var maybeHtml = '<h3 style="margin-top:15px;">⚠️ ' + majorNames[major] + ' - شانس کم / مرز</h3>';
-    if(maybeList.length === 0){ maybeHtml += '<div style="text-align:center;color:#aaa;font-size:12px;">دانشگاهی پیدا نشد.</div>'; } 
+    if(maybeList.length === 0){ maybeHtml += '<div style="text-align:center;color:#aaa;font-size:12px;">دانشگاهی پیدا نشد.</div>'; }
     else { for(var j=0; j<maybeList.length; j++){ maybeHtml += '<div class="uni-item uni-maybe"><span class="name">' + maybeList[j].name + ' <span class="uni-type">' + maybeList[j].type + '</span></span><span class="last">آخرین: ' + maybeList[j].last.toLocaleString('fa-IR') + '</span></div>'; } }
     resDiv.innerHTML = yesHtml + maybeHtml;
   }
   document.getElementById('res').style.display = 'block';
 }
 
-
 async function searchChannel() {
-  const input = document.getElementById('channelSearch');
-  const status = document.getElementById('channelStatus');
-  const results = document.getElementById('channelResults');
-  const query = input.value.trim();
+  var input = document.getElementById("channelSearch");
+  var status = document.getElementById("channelStatus");
+  var results = document.getElementById("channelResults");
+  var query = input.value.trim();
 
   if (!query) {
-    status.textContent = 'اول عبارت جست‌وجو را وارد کن';
+    status.textContent = "لطفاً سوال یا عبارت خود را بنویسید.";
     return;
   }
 
-  status.textContent = 'در حال جست‌وجو...';
-  results.innerHTML = '';
+  status.textContent = "در حال تحلیل هوشمند (ممکن است چند ثانیه طول بکشد)...";
+  results.innerHTML = "";
 
   try {
-    const url = 'https://hokm-akhar-api.tryder2030.workers.dev/search?q=' + encodeURIComponent(query);
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Server error: ' + response.status);
-
-    const data = await response.json();
-    const posts = Array.isArray(data.results) ? data.results : [];
-
-    if (posts.length === 0) {
-      status.textContent = 'نتیجه‌ای پیدا نشد';
-      return;
+    var res = await fetch("https://hokm-akhar-api.tryder2030.workers.dev/search?q=" + encodeURIComponent(query));
+    var data = await res.json();
+    
+    if (!res.ok) {
+       status.innerHTML = "خطای سرور: " + (data.message || data.error || "ناشناخته");
+       return;
     }
 
-    status.textContent = posts.length.toLocaleString('fa-IR') + ' نتیجه پیدا شد';
+    var posts = Array.isArray(data.results) ? data.results : [];
 
-    posts.forEach(post => {
-      const card = document.createElement('div');
-      card.style.cssText = 'padding:14px;margin:10px 0;background:rgba(255,255,255,.07);border-radius:12px;border-right:3px solid #00d2ff';
-
-      const content = document.createElement('p');
-      content.style.cssText = 'font-size:13px;line-height:2;white-space:pre-wrap;overflow-wrap:anywhere';
-      content.textContent = post.post_text || 'متن این پست موجود نیست';
-      card.appendChild(content);
-
-      if (post.post_date) {
-        const date = document.createElement('small');
-        date.style.cssText = 'display:block;margin-top:8px;color:rgba(255,255,255,.6);direction:ltr;text-align:right';
-        const parsedDate = new Date(post.post_date);
-        date.textContent = isNaN(parsedDate.getTime()) ? '' : parsedDate.toLocaleString('fa-IR');
-        card.appendChild(date);
+    if (data.isAI && data.aiAnswer) {
+      var aiBox = document.createElement("div");
+      aiBox.className = "ai-answer-box";
+      aiBox.innerHTML = "🤖 <b>مشاور هوشمند حکم آخر:</b><br><br>" + data.aiAnswer;
+      results.appendChild(aiBox);
+      
+      if(posts.length > 0) {
+          var sep = document.createElement("div");
+          sep.style.cssText = "text-align:center; margin: 15px 0; font-size:12px; color:rgba(255,255,255,0.6);";
+          sep.innerHTML = "🔗 پست‌های مرتبط در کانال:";
+          results.appendChild(sep);
+          renderChannelResults(posts, query);
       }
-
-      if (post.post_link && /^https:\/\/t\.me\//.test(post.post_link)) {
-        const link = document.createElement('a');
-        link.href = post.post_link;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.textContent = 'مشاهده پست در تلگرام ←';
-        link.style.cssText = 'display:block;margin-top:12px;color:#00d2ff;text-decoration:none';
-        card.appendChild(link);
+      status.textContent = "پاسخ هوش مصنوعی آماده شد.";
+    } else {
+      if (posts.length === 0) {
+        status.textContent = "هیچ پستی پیدا نشد.";
+        return;
       }
+      status.textContent = posts.length.toLocaleString("fa-IR") + " نتیجه مرتبط پیدا شد";
+      renderChannelResults(posts, query);
+    }
 
-      results.appendChild(card);
-    });
-  } catch (error) {
-    console.error('Channel search error:', error);
-    status.textContent = 'ارتباط با سرور برقرار نشد؛ دوباره تلاش کن';
+  } catch (err) {
+    status.textContent = "خطای شبکه: " + err.message;
   }
+}
+
+function renderChannelResults(posts, query) {
+  var results = document.getElementById("channelResults");
+
+  posts.forEach(function (post) {
+    var card = document.createElement("div");
+    card.style.cssText = "padding:14px;margin:10px 0;background:rgba(255,255,255,.07);border-radius:12px;border-right:3px solid #00d2ff";
+
+    if (post.relevance !== undefined) {
+      var relWrap = document.createElement("div");
+      relWrap.style.cssText = "display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;color:rgba(255,255,255,.75)";
+      var barOuter = document.createElement("div");
+      barOuter.style.cssText = "flex:1;height:6px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden";
+      var barInner = document.createElement("div");
+      barInner.style.cssText = "height:100%;width:" + post.relevance + "%;background:linear-gradient(90deg,#00d2ff,#3a7bd5)";
+      barOuter.appendChild(barInner);
+      var relText = document.createElement("span");
+      relText.textContent = "ارتباط: " + post.relevance + "٪";
+      relWrap.appendChild(barOuter);
+      relWrap.appendChild(relText);
+      card.appendChild(relWrap);
+    }
+
+    var content = document.createElement("p");
+    content.style.cssText = "font-size:13px;line-height:2;white-space:pre-wrap;overflow-wrap:anywhere";
+    var text = post.post_text || "متن این پست موجود نیست";
+    var safe = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    var parts = text.split(new RegExp("(" + safe + ")", "gi"));
+    parts.forEach(function (part) {
+      if (part.toLowerCase() === query.toLowerCase()) {
+        var mark = document.createElement("mark");
+        mark.style.cssText = "background:#00d2ff33;color:#00d2ff;border-radius:3px";
+        mark.textContent = part;
+        content.appendChild(mark);
+      } else {
+        content.appendChild(document.createTextNode(part));
+      }
+    });
+    card.appendChild(content);
+
+    if (post.post_date) {
+      var date = document.createElement("small");
+      date.style.cssText = "display:block;margin-top:8px;color:rgba(255,255,255,.6);direction:ltr;text-align:right";
+      var pd = new Date(post.post_date);
+      date.textContent = isNaN(pd.getTime()) ? "" : pd.toLocaleString("fa-IR");
+      card.appendChild(date);
+    }
+
+    if (post.post_link && /^https:\/\/t\.me\//.test(post.post_link)) {
+      var link = document.createElement("a");
+      link.href = post.post_link;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "مشاهده پست در تلگرام ←";
+      link.style.cssText = "display:block;margin-top:10px;color:#00d2ff;text-decoration:none;font-size:12px;";
+      card.appendChild(link);
+    }
+
+    results.appendChild(card);
+  });
 }
 </script>
 </body>
-</html>
+  </html>
