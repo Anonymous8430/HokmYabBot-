@@ -527,31 +527,25 @@ function calcCombined() {
     if(validCount > 0) {
       var weightedAvg = sumWeighted / sumCoeffs;
       
-      // ===== منطق غیرخطی جدید بر اساس داده‌های واقعی =====
-      // سقف: معدل ۲۰ = تراز ۱۰۷۲۸
-      // نقاط کلیدی داده‌ها: 19.80 -> 9788, 19.57 -> 9725, 19.54 -> 10154 (این یکیش نویز داره), 19.49 -> 9896, 19.33 -> 9274
-      // کف: معدل 16.98 -> 7806
-      
+      // ===== منطق اصلاح‌شده و واقع‌گرایانه‌تر =====
       if (weightedAvg >= 20) {
         schoolTaraz = 10728;
+      } else if (weightedAvg >= 19.8) {
+        var ratio = (weightedAvg - 19.8) / 0.2;
+        schoolTaraz = 9788 + (ratio * 940); // از ۹۷۸۸ تا ۱۰۷۲۸
       } else if (weightedAvg >= 19.5) {
-        // بازه طلایی ۱۹.۵ تا ۲۰ (شیب تند و نجومی)
-        var ratio = (weightedAvg - 19.5) / 0.5;
-        schoolTaraz = 9800 + (ratio * 928); // از ۹۸۰۰ تا ۱۰۷۲۸
+        var ratio = (weightedAvg - 19.5) / 0.3;
+        schoolTaraz = 9600 + (ratio * 188); // از ۹۶۰۰ تا ۹۷۸۸
       } else if (weightedAvg >= 19.0) {
-        // بازه ۱۹ تا ۱۹.۵
         var ratio = (weightedAvg - 19.0) / 0.5;
-        schoolTaraz = 9400 + (ratio * 400); // از ۹۴۰۰ تا ۹۸۰۰
+        schoolTaraz = 9400 + (ratio * 200); // از ۹۴۰۰ تا ۹۶۰۰
       } else if (weightedAvg >= 18.5) {
-        // بازه ۱۸.۵ تا ۱۹
         var ratio = (weightedAvg - 18.5) / 0.5;
         schoolTaraz = 9000 + (ratio * 400); // از ۹۰۰۰ تا ۹۴۰۰
       } else if (weightedAvg >= 16.98) {
-        // بازه ۱۶.۹۸ تا ۱۸.۵
         var ratio = (weightedAvg - 16.98) / (18.5 - 16.98);
         schoolTaraz = 7806 + (ratio * 1194); // از ۷۸۰۶ تا ۹۰۰۰
       } else {
-        // زیر ۱۶.۹۸
         var ratio = (weightedAvg - 10) / (16.98 - 10);
         if(ratio < 0) ratio = 0;
         schoolTaraz = 3000 + (ratio * 4806);
@@ -744,4 +738,4 @@ function renderChannelResults(posts, query) {
 }
 </script>
 </body>
-</html>
+  </html>
