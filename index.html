@@ -118,20 +118,20 @@
     <button class="switch-btn" onclick="switchMode('percent')">بازگشت به درصدها</button>
   </div>
 
-  <!-- بخش جدید: فرم نمرات نهایی -->
+  <!-- بخش جدید: فرم نمرات نهایی با ضرایب دقیق -->
   <div id="gradesForm">
     <h3 style="color:#00d2ff; text-align:center; margin-bottom:15px; font-size:15px;">نمرات نهایی (از ۲۰)</h3>
     <div class="grade-grid">
-      <div class="grade-item"><label>زیست</label><input id="g_biology" type="number" step="0.25" placeholder="20"></div>
-      <div class="grade-item"><label>ریاضی</label><input id="g_math" type="number" step="0.25" placeholder="20"></div>
-      <div class="grade-item"><label>فیزیک</label><input id="g_physics" type="number" step="0.25" placeholder="20"></div>
-      <div class="grade-item"><label>شیمی</label><input id="g_chemistry" type="number" step="0.25" placeholder="20"></div>
-      <div class="grade-item"><label>فارسی</label><input id="g_persian" type="number" step="0.25" placeholder="20"></div>
-      <div class="grade-item"><label>عربی</label><input id="g_arabic" type="number" step="0.25" placeholder="20"></div>
-      <div class="grade-item"><label>دینی</label><input id="g_religion" type="number" step="0.25" placeholder="20"></div>
-      <div class="grade-item"><label>زبان</label><input id="g_english" type="number" step="0.25" placeholder="20"></div>
-      <div class="grade-item"><label>اجتماعی</label><input id="g_social" type="number" step="0.25" placeholder="20"></div>
-      <div class="grade-item"><label>سلامت</label><input id="g_health" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>زیست (۱۰.۶۶)</label><input id="g_biology" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>ریاضی (۱۰.۰۴)</label><input id="g_math" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>فارسی (۱۱.۰۹)</label><input id="g_persian" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>شیمی (۹.۱۹)</label><input id="g_chemistry" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>دینی (۸.۴۷)</label><input id="g_religion" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>فیزیک (۸.۴۵)</label><input id="g_physics" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>زبان (۶.۰۵)</label><input id="g_english" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>عربی (۴.۶۴)</label><input id="g_arabic" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>سلامت (۱.۷۶)</label><input id="g_health" type="number" step="0.25" placeholder="20"></div>
+      <div class="grade-item"><label>اجتماعی (۱.۳۱)</label><input id="g_social" type="number" step="0.25" placeholder="20"></div>
     </div>
     <div style="margin-bottom:15px;">
       <label style="font-size:13px; display:block; margin-bottom:5px;">تراز اختصاصی کنکور (۴۰٪):</label>
@@ -529,34 +529,71 @@ function calcDirect(){
   showResult(taraz, rank, region, null);
 }
 
-// بخش جدید: محاسبه با نمرات نهایی و تاثیر ۶۰٪
+// بخش جدید: محاسبه با نمرات نهایی و تاثیر ۶۰٪ (با ضرایب اصلاح‌شده)
 function calcGrades() {
   var region = document.getElementById('regionSelect').value;
-  var grades = [
-    parseFloat(document.getElementById('g_biology').value) || 0,
-    parseFloat(document.getElementById('g_math').value) || 0,
-    parseFloat(document.getElementById('g_physics').value) || 0,
-    parseFloat(document.getElementById('g_chemistry').value) || 0,
-    parseFloat(document.getElementById('g_persian').value) || 0,
-    parseFloat(document.getElementById('g_arabic').value) || 0,
-    parseFloat(document.getElementById('g_religion').value) || 0,
-    parseFloat(document.getElementById('g_english').value) || 0,
-    parseFloat(document.getElementById('g_social').value) || 0,
-    parseFloat(document.getElementById('g_health').value) || 0
-  ];
+  
+  // ضرایب رسمی و اصلاح‌شده دروس
+  var coeffs = {
+    biology: 10.66,
+    persian: 11.09,
+    chemistry: 9.19,
+    religion: 8.47,
+    math: 10.04,
+    english: 6.05,
+    physics: 8.45,
+    arabic: 4.64,
+    health: 1.76,
+    social: 1.31
+  };
 
-  var sumGrades = 0;
-  var validGradesCount = 0;
-  for(var i=0; i<grades.length; i++) {
-    if(grades[i] > 0) { sumGrades += grades[i]; validGradesCount++; }
+  var grades = {
+    biology: parseFloat(document.getElementById('g_biology').value) || 0,
+    persian: parseFloat(document.getElementById('g_persian').value) || 0,
+    chemistry: parseFloat(document.getElementById('g_chemistry').value) || 0,
+    religion: parseFloat(document.getElementById('g_religion').value) || 0,
+    math: parseFloat(document.getElementById('g_math').value) || 0,
+    english: parseFloat(document.getElementById('g_english').value) || 0,
+    physics: parseFloat(document.getElementById('g_physics').value) || 0,
+    arabic: parseFloat(document.getElementById('g_arabic').value) || 0,
+    health: parseFloat(document.getElementById('g_health').value) || 0,
+    social: parseFloat(document.getElementById('g_social').value) || 0
+  };
+
+  var sumWeighted = 0;
+  var sumCoeffs = 0;
+  var validCount = 0;
+
+  for(var key in grades) {
+    if(grades[key] > 0) {
+      sumWeighted += (grades[key] * coeffs[key]);
+      sumCoeffs += coeffs[key];
+      validCount++;
+    }
   }
 
-  if(validGradesCount === 0) { alert('حداقل یک نمره معتبر وارد کنید.'); return; }
+  if(validCount === 0) { alert('حداقل یک نمره معتبر وارد کنید.'); return; }
 
-  var avgGrade = sumGrades / validGradesCount;
+  // محاسبه معدل وزنی (وزن‌دار بر اساس ضرایب)
+  var weightedAvg = sumWeighted / sumCoeffs;
   
-  // تبدیل معدل به تراز سابقه تحصیلی (تخمین: معدل ۲۰ = تراز ۱۲۰۰۰، معدل ۱۰ = تراز ۶۰۰۰)
-  var schoolTaraz = 6000 + (avgGrade / 20) * 6000;
+  // تبدیل معدل وزنی به تراز سابقه تحصیلی با استفاده از داده‌های واقعی
+  // فرمول تقریبی بر اساس نقاط (20, 10728) و (16.98, 7806) و (10, 3000)
+  var schoolTaraz = 0;
+  
+  if (weightedAvg >= 16.98) {
+    // بازه ۱۶.۹۸ تا ۲۰
+    var ratio = (weightedAvg - 16.98) / (20 - 16.98);
+    schoolTaraz = 7806 + ratio * (10728 - 7806);
+    if(weightedAvg > 19) {
+       schoolTaraz += (weightedAvg - 19) * 150; 
+    }
+  } else {
+    // بازه زیر ۱۶.۹۸
+    var ratio = (weightedAvg - 10) / (16.98 - 10);
+    if(ratio < 0) ratio = 0;
+    schoolTaraz = 3000 + ratio * (7806 - 3000);
+  }
 
   var examTaraz = parseFloat(document.getElementById('exam_taraz').value);
   if(isNaN(examTaraz)) { examTaraz = 6000; } // مقدار پیش‌فرض
@@ -566,7 +603,7 @@ function calcGrades() {
   
   var rank = getRankFromTaraz(finalTaraz, region);
   
-  var breakdown = 'معدل کتبی: ' + avgGrade.toFixed(2) + ' | تراز سابقه تحصیلی: ' + Math.round(schoolTaraz) + ' | تراز کنکور: ' + Math.round(examTaraz);
+  var breakdown = 'معدل وزنی (با ضرایب): ' + weightedAvg.toFixed(2) + ' | تراز سابقه تحصیلی: ' + Math.round(schoolTaraz) + ' | تراز کنکور: ' + Math.round(examTaraz);
   showResult(finalTaraz, rank, region, breakdown);
 }
 
