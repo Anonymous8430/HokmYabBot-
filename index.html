@@ -515,7 +515,7 @@ function calcCombined() {
       social: parseFloat(document.getElementById('g_social').value) || 0
     };
     
-    // ===== کلید تخمین سابقه تحصیلی (کالیبره شده با ۶ کارنامه واقعی) =====
+    // ===== کلید تخمین سابقه تحصیلی (کالیبره شده نهایی نسخه ۸) =====
     var sumWeighted = 0, sumCoeffs = 0, validCount = 0;
     var bonus = 0;
     
@@ -537,8 +537,8 @@ function calcCombined() {
           var weightFactor = coeffs[key] / sumCoeffs;
           
           if (coeffs[key] >= 8) { // دروس پرضریب
-              if (diff > 0) bonus += (diff * weightFactor * 465);
-              else bonus += (diff * weightFactor * 200);
+              if (diff > 0) bonus += (diff * weightFactor * 650); // افزایش به ۶۵۰ برای دقت بالای نمرات ۲۰
+              else bonus += (diff * weightFactor * 220);
           } else { // دروس کم‌ضریب
               if (diff < 0) bonus += (diff * weightFactor * 100);
               else bonus += (diff * weightFactor * 50);
