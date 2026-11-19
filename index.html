@@ -515,7 +515,10 @@ function calcCombined() {
       social: parseFloat(document.getElementById('g_social').value) || 0
     };
     
+    // ===== کلید تخمین سابقه تحصیلی (کالیبره شده با ۶ کارنامه واقعی) =====
     var sumWeighted = 0, sumCoeffs = 0, validCount = 0;
+    var bonus = 0;
+    
     for(var key in grades) {
       if(grades[key] > 0) {
         sumWeighted += (grades[key] * coeffs[key]);
@@ -527,30 +530,36 @@ function calcCombined() {
     if(validCount > 0) {
       var weightedAvg = sumWeighted / sumCoeffs;
       
-      // ===== منطق اصلاح‌شده و واقع‌گرایانه‌تر =====
-      if (weightedAvg >= 20) {
-        schoolTaraz = 10728;
-      } else if (weightedAvg >= 19.8) {
-        var ratio = (weightedAvg - 19.8) / 0.2;
-        schoolTaraz = 9788 + (ratio * 940); // از ۹۷۸۸ تا ۱۰۷۲۸
-      } else if (weightedAvg >= 19.5) {
-        var ratio = (weightedAvg - 19.5) / 0.3;
-        schoolTaraz = 9600 + (ratio * 188); // از ۹۶۰۰ تا ۹۷۸۸
-      } else if (weightedAvg >= 19.0) {
-        var ratio = (weightedAvg - 19.0) / 0.5;
-        schoolTaraz = 9400 + (ratio * 200); // از ۹۴۰۰ تا ۹۶۰۰
-      } else if (weightedAvg >= 18.5) {
-        var ratio = (weightedAvg - 18.5) / 0.5;
-        schoolTaraz = 9000 + (ratio * 400); // از ۹۰۰۰ تا ۹۴۰۰
-      } else if (weightedAvg >= 16.98) {
-        var ratio = (weightedAvg - 16.98) / (18.5 - 16.98);
-        schoolTaraz = 7806 + (ratio * 1194); // از ۷۸۰۶ تا ۹۰۰۰
-      } else {
-        var ratio = (weightedAvg - 10) / (16.98 - 10);
-        if(ratio < 0) ratio = 0;
-        schoolTaraz = 3000 + (ratio * 4806);
+      // محاسبه پاداش و جریمه دروس
+      for(var key in grades) {
+        if(grades[key] > 0) {
+          var diff = grades[key] - weightedAvg;
+          var weightFactor = coeffs[key] / sumCoeffs;
+          
+          if (coeffs[key] >= 8) { // دروس پرضریب
+              if (diff > 0) bonus += (diff * weightFactor * 465);
+              else bonus += (diff * weightFactor * 200);
+          } else { // دروس کم‌ضریب
+              if (diff < 0) bonus += (diff * weightFactor * 100);
+              else bonus += (diff * weightFactor * 50);
+          }
+        }
       }
+      
+      // فرمول پایه دو تکه‌ای
+      var baseTaraz;
+      if (weightedAvg <= 19.4) {
+          baseTaraz = 8742 + (weightedAvg - 18.88) * 1350; 
+      } else {
+          baseTaraz = 8742 + (19.4 - 18.88) * 1350 + (weightedAvg - 19.4) * 850;
+      }
+      
+      schoolTaraz = baseTaraz + bonus;
+      
+      if(schoolTaraz > 10800) schoolTaraz = 10800;
+      if(schoolTaraz < 3000) schoolTaraz = 3000;
     }
+    // ===== پایان کلید تخمین =====
   }
 
   if(examTaraz === null || schoolTaraz === null) {
