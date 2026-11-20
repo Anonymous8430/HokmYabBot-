@@ -54,20 +54,14 @@
   .grade-item input { width: 45px; padding: 4px; text-align: center; border-radius: 5px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; font-size: 13px; }
   .hint { font-size: 11px; color: #f1c40f; margin-top: 5px; text-align: center; display: block; }
   
-  .share-container { display: flex; gap: 10px; margin: 15px 0; justify-content: center; flex-wrap: wrap; }
-  .share-btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 15px; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; text-decoration: none; }
-  .share-telegram { background: #0088cc; color: #fff; box-shadow: 0 4px 10px rgba(0, 136, 204, 0.3); }
-  .share-telegram:hover { background: #006699; transform: translateY(-2px); }
-  .share-copy { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
-  .share-copy:hover { background: rgba(255,255,255,0.25); transform: translateY(-2px); }
-  .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #2ecc71; color: #fff; padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s; z-index: 999; pointer-events: none; }
-  .toast.show { opacity: 1; }
-
   /* استایل جدید برای فیلد ورود مستقیم */
   .direct-input-box { background: rgba(0,0,0,0.3); border: 1px dashed rgba(0,210,255,0.4); border-radius: 12px; padding: 15px; margin-bottom: 15px; text-align: center; }
   .direct-input-box label { display: block; font-size: 13px; color: #00d2ff; margin-bottom: 8px; font-weight: bold; }
-  .direct-input-box select, .direct-input-box input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; text-align: center; font-size: 14px; outline: none; margin-bottom: 10px; }
-  .direct-input-box input:focus, .direct-input-box select:focus { border-color: #00d2ff; }
+  .tab-container { display: flex; gap: 5px; margin-bottom: 10px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 8px; }
+  .tab-btn { flex: 1; padding: 8px; border-radius: 6px; border: none; background: transparent; color: rgba(255,255,255,0.6); cursor: pointer; font-size: 13px; font-weight: bold; transition: 0.3s; margin-top: 0; width: auto; box-shadow: none; }
+  .tab-btn.active { background: #00d2ff; color: #0f2027; box-shadow: 0 2px 8px rgba(0,210,255,0.3); }
+  .direct-input-box input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; text-align: center; font-size: 14px; outline: none; margin-bottom: 10px; }
+  .direct-input-box input:focus { border-color: #00d2ff; }
   
   /* دکمه دریافت کارت عکس */
   .btn-image { background: linear-gradient(90deg, #2ecc71 0%, #27ae60 100%) !important; box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4) !important; margin-top: 15px !important; }
@@ -78,8 +72,12 @@
   .modal.show { display: flex; }
   .modal-content { background: #1e3c72; border-radius: 16px; padding: 20px; max-width: 500px; width: 100%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
   .modal-content img { width: 100%; border-radius: 12px; margin-bottom: 15px; }
-  .modal-content .close-btn { background: #ff416c; color: #fff; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: bold; margin-top: 10px; }
-  .modal-content .download-btn { background: #2ecc71; color: #fff; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: bold; margin-top: 10px; margin-left: 10px; }
+  .modal-content .close-btn { background: #ff416c; color: #fff; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: bold; margin-top: 10px; width: 100%; }
+  .modal-content .share-btn-tg { background: #0088cc; color: #fff; padding: 12px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .modal-content .share-btn-tg:hover { background: #006699; }
+  
+  /* مخفی کردن دکمه‌های اشتراک‌گذاری قبلی */
+  .share-container { display: none !important; }
 </style>
 </head>
 <body>
@@ -127,11 +125,13 @@
     <!-- فیلد ورود مستقیم رتبه یا تراز -->
     <div class="direct-input-box">
       <label>🔢 محاسبه سریع با ورود مستقیم رتبه یا تراز کل</label>
-      <select id="directType">
-        <option value="taraz">ورود تراز کل</option>
-        <option value="rank">ورود رتبه</option>
-      </select>
-      <input id="directValue" type="number" placeholder="مثلا 8500 (تراز) یا 1500 (رتبه)">
+      
+      <div class="tab-container">
+        <button class="tab-btn active" id="tabTaraz" onclick="setDirectType('taraz')">تراز کل</button>
+        <button class="tab-btn" id="tabRank" onclick="setDirectType('rank')">رتبه</button>
+      </div>
+      
+      <input id="directValue" type="number" placeholder="مقدار را وارد کنید...">
       <button onclick="calcDirect()" style="margin-top:5px; padding:12px; background:#00d2ff; color:#000;">محاسبه سریع</button>
     </div>
     
@@ -175,11 +175,6 @@
       <div class="item">رتبه تقریبی: <span class="rank" id="outRank">-</span></div>
       <div id="calcBreakdown" style="font-size:12px; text-align:center; color:#aaa; margin-top:10px; display:none;"></div>
       
-      <div class="share-container" id="shareContainer" style="display:none;">
-        <button class="share-btn share-telegram" onclick="shareTelegram()">📤 اشتراک‌گذاری در تلگرام</button>
-        <button class="share-btn share-copy" onclick="copyShareText()">📋 کپی متن</button>
-      </div>
-
       <button class="btn-image" id="btnImage" onclick="generateImage()" style="display:none;">📸 دریافت کارت نتیجه (عکس)</button>
 
       <div class="unis" id="uniResults"></div>
@@ -195,7 +190,7 @@
     <h3 style="color:#fff; margin-bottom:10px;">📸 کارت نتیجه شما</h3>
     <img id="resultImage" src="" alt="کارت نتیجه">
     <div>
-      <button class="download-btn" onclick="downloadImage()">⬇️ دانلود</button>
+      <button class="share-btn-tg" onclick="shareImageToTelegram()">📤 اشتراک‌گذاری در تلگرام</button>
       <button class="close-btn" onclick="closeModal()">بستن</button>
     </div>
   </div>
@@ -209,9 +204,6 @@
     throw new Error("Unauthorized domain");
   }
 </script>
-
-<!-- داده‌ها -->
-<script src="data:application/javascript;base64," id="dummy"></script>
 
 <script>
 // ==========================================
@@ -1468,9 +1460,15 @@ function calcCombined() {
   showResult(finalTaraz, rank, region, breakdown);
 }
 
-// تابع جدید برای محاسبه با ورود مستقیم رتبه یا تراز
+var currentDirectType = 'taraz';
+function setDirectType(type) {
+  currentDirectType = type;
+  document.getElementById('tabTaraz').classList.toggle('active', type === 'taraz');
+  document.getElementById('tabRank').classList.toggle('active', type === 'rank');
+  document.getElementById('directValue').placeholder = type === 'taraz' ? 'مثلا ۸۵۰۰ (تراز)' : 'مثلا ۱۵۰۰ (رتبه)';
+}
+
 function calcDirect() {
-  var type = document.getElementById('directType').value;
   var val = parseFloat(document.getElementById('directValue').value);
   var region = document.getElementById('regionSelect').value;
   
@@ -1481,7 +1479,7 @@ function calcDirect() {
 
   var rank, finalTaraz;
   
-  if (type === 'taraz') {
+  if (currentDirectType === 'taraz') {
     finalTaraz = val;
     rank = getRankFromTaraz(finalTaraz, region);
   } else {
@@ -1494,10 +1492,9 @@ function calcDirect() {
     return;
   }
   
-  showResult(finalTaraz, rank, region, 'محاسبه مستقیم از ' + (type === 'taraz' ? 'تراز کل' : 'رتبه') + ': ' + val.toLocaleString('fa-IR'));
+  showResult(finalTaraz, rank, region, 'محاسبه مستقیم از ' + (currentDirectType === 'taraz' ? 'تراز کل' : 'رتبه') + ': ' + val.toLocaleString('fa-IR'));
 }
 
-// تابع معکوس برای پیدا کردن تراز از روی رتبه
 function getTarazFromRank(rank, region) {
   var table = tarazRankTable[region];
   if (rank <= table[0][1]) return table[0][0];
@@ -1535,10 +1532,8 @@ function showResult(taraz, rank, region, breakdown) {
   lastResult.region = region;
 
   if (rank) {
-    document.getElementById('shareContainer').style.display = 'flex';
     document.getElementById('btnImage').style.display = 'block';
   } else {
-    document.getElementById('shareContainer').style.display = 'none';
     document.getElementById('btnImage').style.display = 'none';
   }
   
@@ -1594,9 +1589,6 @@ function showResult(taraz, rank, region, breakdown) {
   document.getElementById('res').style.display = 'block';
 }
 
-// ==========================================
-// === تولید عکس با Canvas ===
-// ==========================================
 function generateImage() {
   var canvas = document.createElement('canvas');
   var ctx = canvas.getContext('2d');
@@ -1660,41 +1652,63 @@ function generateImage() {
   ctx.font = 'bold 24px Tahoma';
   ctx.fillText('🏆 ۱۰ دانشگاه شاخص قابل قبولی', width / 2, 510);
 
-  // پیدا کردن ۱۰ دانشگاه شاخص از همه رشته‌ها
+  // پیدا کردن ۱۰ دانشگاه شاخص با اولویت رشته
   var regionKey = 'r' + lastResult.region;
-  var allMatches = [];
-  Object.keys(unisData).forEach(function(major) {
-    unisData[major].forEach(function(uni) {
+  
+  var majorPriority = [
+    'dental', 'medicine', 'pharmacy', 'physio', 'optometry', 'audiology', 
+    'prosthetics', 'orthotics', 'occupational_therapy', 'nutrition', 
+    'radiology', 'midwifery', 'nursing', 'phd_continuous', 'vet'
+  ];
+
+  var selectedUnis = [];
+  
+  majorPriority.forEach(function(major) {
+    if (selectedUnis.length >= 10) return;
+    var unis = unisData[major] || [];
+    var validUnis = [];
+    unis.forEach(function(uni) {
       if (uni[regionKey] !== null && uni[regionKey] >= lastResult.rank) {
-        allMatches.push({ major: majorNames[major], name: uni.name, rank: uni[regionKey] });
+        validUnis.push({ major: majorNames[major], name: uni.name, rank: uni[regionKey] });
       }
     });
+    validUnis.sort(function(a, b) { return a.rank - b.rank; });
+    
+    var takeCount = Math.min(3, validUnis.length, 10 - selectedUnis.length);
+    for (var i = 0; i < takeCount; i++) {
+      selectedUnis.push(validUnis[i]);
+    }
   });
 
-  // مرتب‌سازی بر اساس رتبه (بهترین‌ها اول)
-  allMatches.sort(function(a, b) { return a.rank - b.rank; });
-  var top10 = allMatches.slice(0, 10);
-
   // نوشتن لیست
-  ctx.font = '18px Tahoma';
+  ctx.font = '16px Tahoma';
   ctx.textAlign = 'right';
   var y = 560;
-  if (top10.length === 0) {
+  if (selectedUnis.length === 0) {
     ctx.fillStyle = 'rgba(255,255,255,0.6)';
     ctx.fillText('با این رتبه، هیچ دانشگاهی پیدا نشد.', width - 100, y);
   } else {
-    top10.forEach(function(item, index) {
+    selectedUnis.forEach(function(item, index) {
       if (y > height - 120) return;
       ctx.fillStyle = index % 2 === 0 ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.1)';
       ctx.fillRect(60, y - 20, width - 120, 35);
       
+      // نام دانشگاه
       ctx.fillStyle = '#a3e4d7';
-      ctx.font = 'bold 16px Tahoma';
-      ctx.fillText((index + 1) + '. ' + item.name, width - 90, y + 5);
+      ctx.font = 'bold 15px Tahoma';
+      ctx.fillText((index + 1) + '. ' + item.name, width - 200, y + 5);
       
+      // رتبه در سمت چپ کادر
+      ctx.fillStyle = '#ff416c';
+      ctx.font = 'bold 14px Tahoma';
+      ctx.textAlign = 'left';
+      ctx.fillText('آخرین: ' + item.rank.toLocaleString('fa-IR'), 80, y + 5);
+      ctx.textAlign = 'right';
+      
+      // رشته زیر اسم
       ctx.fillStyle = 'rgba(255,255,255,0.6)';
       ctx.font = '12px Tahoma';
-      ctx.fillText('(' + item.major + ') - آخرین رتبه: ' + item.rank.toLocaleString('fa-IR'), width - 90, y + 22);
+      ctx.fillText('(' + item.major + ')', width - 90, y + 22);
       
       y += 40;
     });
@@ -1710,79 +1724,46 @@ function generateImage() {
   var imgData = canvas.toDataURL('image/png');
   document.getElementById('resultImage').src = imgData;
   document.getElementById('imageModal').classList.add('show');
-  document.getElementById('resultImage').dataset.download = 'hokm-akhar-result.png';
+}
+
+function shareImageToTelegram() {
+  var imgSrc = document.getElementById('resultImage').src;
+  var regText = lastResult.region === '1' ? 'منطقه ۱' : (lastResult.region === '2' ? 'منطقه ۲' : 'منطقه ۳');
+  var text = "رتبه تقریبی من با ماشین‌حساب حکم آخر:\n" +
+             "🔹 تراز: " + lastResult.taraz.toLocaleString('fa-IR') + "\n" +
+             "🔹 رتبه تقریبی: " + lastResult.rank + " (" + regText + ")\n" +
+             "تو هم با همین لینک رتبه‌ت رو تخمین بزن و ببین کدوم دانشگاه‌ها رو می‌تونی بزنی 👇\n" +
+             "https://t.me/Hokm_Akhar";
+  
+  if (navigator.share) {
+    fetch(imgSrc)
+      .then(res => res.blob())
+      .then(blob => {
+        var file = new File([blob], 'hokm-akhar-result.png', { type: 'image/png' });
+        navigator.share({
+          title: 'کارت نتیجه حکم آخر',
+          text: text,
+          files: [file]
+        }).catch(err => {
+          navigator.share({ title: 'کارت نتیجه حکم آخر', text: text }).catch(() => {
+            window.open("https://t.me/share/url?url=" + encodeURIComponent("https://t.me/Hokm_Akhar") + "&text=" + encodeURIComponent(text), '_blank');
+          });
+        });
+      })
+      .catch(() => {
+        navigator.share({ title: 'کارت نتیجه حکم آخر', text: text }).catch(() => {
+          window.open("https://t.me/share/url?url=" + encodeURIComponent("https://t.me/Hokm_Akhar") + "&text=" + encodeURIComponent(text), '_blank');
+        });
+      });
+  } else {
+    window.open("https://t.me/share/url?url=" + encodeURIComponent("https://t.me/Hokm_Akhar") + "&text=" + encodeURIComponent(text), '_blank');
+  }
 }
 
 function closeModal() {
   document.getElementById('imageModal').classList.remove('show');
 }
 
-function downloadImage() {
-  var link = document.createElement('a');
-  link.download = 'hokm-akhar-result.png';
-  link.href = document.getElementById('resultImage').src;
-  link.click();
-}
-
-// ==========================================
-// === اشتراک‌گذاری ===
-// ==========================================
-function getShareText() {
-  var regText = lastResult.region === '1' ? 'منطقه ۱' : (lastResult.region === '2' ? 'منطقه ۲' : 'منطقه ۳');
-  return "رتبه تقریبی من با ماشین‌حساب حکم آخر:\n" +
-         "🔹 تراز: " + lastResult.taraz.toLocaleString('fa-IR') + "\n" +
-         "🔹 رتبه تقریبی: " + lastResult.rank + " (" + regText + ")\n" +
-         "تو هم با همین لینک رتبه‌ت رو تخمین بزن و ببین کدوم دانشگاه‌ها رو می‌تونی بزنی 👇\n" +
-         "https://t.me/Hokm_Akhar";
-}
-
-function shareTelegram() {
-  var text = getShareText();
-  var url = "https://t.me/share/url?url=" + encodeURIComponent("https://t.me/Hokm_Akhar") + "&text=" + encodeURIComponent(text);
-  window.open(url, '_blank');
-}
-
-function copyShareText() {
-  var text = getShareText();
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(function() {
-      showToast();
-    }).catch(function(err) {
-      fallbackCopy(text);
-    });
-  } else {
-    fallbackCopy(text);
-  }
-}
-
-function fallbackCopy(text) {
-  var textArea = document.createElement("textarea");
-  textArea.value = text;
-  textArea.style.position = "fixed";
-  textArea.style.top = "-9999px";
-  document.body.appendChild(textArea);
-  textArea.focus();
-  textArea.select();
-  try {
-    document.execCommand('copy');
-    showToast();
-  } catch (err) {
-    alert('کپی نشد. لطفاً دستی کپی کنید.');
-  }
-  document.body.removeChild(textArea);
-}
-
-function showToast() {
-  var toast = document.getElementById('toast');
-  toast.classList.add('show');
-  setTimeout(function() {
-    toast.classList.remove('show');
-  }, 2500);
-}
-
-// ==========================================
-// === جستجوی کانال (مشاور هوشمند) ===
-// ==========================================
 async function searchChannel() {
   var input = document.getElementById("channelSearch");
   var status = document.getElementById("channelStatus");
@@ -1898,4 +1879,4 @@ function renderChannelResults(posts, query) {
 }
 </script>
 </body>
-      </html>
+                                 </html>
