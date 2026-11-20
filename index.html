@@ -1537,7 +1537,9 @@ function showResult(taraz, rank, region, breakdown) {
     breakdownDiv.style.display = 'none';
   }
 
-  var major = document.getElementById('majorSelect').value; var resDiv = document.getElementById('uniResults'); resDiv.innerHTML = '';
+  var major = document.getElementById('majorSelect').value; 
+  var resDiv = document.getElementById('uniResults'); 
+  resDiv.innerHTML = '';
   var regionKey = 'r' + region;
 
   var majorsToShow = major === 'all' ? Object.keys(unisData) : [major];
@@ -1545,6 +1547,7 @@ function showResult(taraz, rank, region, breakdown) {
   majorsToShow.forEach(function(currentMajor) {
     var data = unisData[currentMajor];
     var yesList = [], maybeList = [];
+    
     for(var u=0; u<data.length; u++){
       var lastRank = data[u][regionKey];
       if(lastRank === null) continue; 
@@ -1553,8 +1556,14 @@ function showResult(taraz, rank, region, breakdown) {
       var item = data[u];
       var yesThreshold = (region === "3") ? 80 : 50;
       var maybeThreshold = (region === "3") ? -120 : -100;
-      if(diff >= yesThreshold) yesList.push(item); else if(diff >= maybeThreshold && diff < yesThreshold) maybeList.push(item);
+      
+      if(diff >= yesThreshold) yesList.push(item); 
+      else if(diff >= maybeThreshold && diff < yesThreshold) maybeList.push(item);
     }
+    
+    // === مرتب‌سازی بر اساس بهترین رتبه (کمترین عدد) ===
+    yesList.sort(function(a, b) { return a[regionKey] - b[regionKey]; });
+    maybeList.sort(function(a, b) { return a[regionKey] - b[regionKey]; });
     
     if(yesList.length === 0 && maybeList.length === 0) return;
     
@@ -1576,7 +1585,9 @@ function showResult(taraz, rank, region, breakdown) {
     }
   });
 
-  if(resDiv.innerHTML === '') { resDiv.innerHTML = '<div style="text-align:center;color:#aaa;font-size:13px;padding:20px;">با این رتبه، در هیچ‌کدام از رشته‌های انتخابی شانس قبولی نداری.</div>'; }
+  if(resDiv.innerHTML === '') { 
+      resDiv.innerHTML = '<div style="text-align:center;color:#aaa;font-size:13px;padding:20px;">با این رتبه، در هیچ‌کدام از رشته‌های انتخابی شانس قبولی نداری.</div>'; 
+  }
   
   document.getElementById('res').style.display = 'block';
 }
