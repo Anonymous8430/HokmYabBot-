@@ -17,57 +17,54 @@
   .selector-row { display: flex; gap: 10px; margin-bottom: 20px; }
   .selector-row select { flex: 1; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; font-size: 14px; text-align: center; background: rgba(0,0,0,0.2); color: #fff; outline: none; appearance: none; }
   .selector-row select option { background: #1e3c72; color: #fff; }
-  .row { display: flex; align-items: center; gap: 10px; margin: 12px 0; }
-  .row label { flex: 1; font-size: 14px; color: rgba(255,255,255,0.9); }
-  .row .coef { font-size: 11px; color: #00d2ff; background: rgba(0, 210, 255, 0.1); padding: 3px 8px; border-radius: 20px; border: 1px solid rgba(0, 210, 255, 0.2); }
-  .row input { width: 100px; padding: 10px; border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; text-align: center; font-size: 15px; outline: none; background: rgba(0,0,0,0.2); color: #fff; transition: 0.3s; }
+  .row { display: flex; align-items: center; gap: 12px; margin: 14px 0; }
+  .row label { flex: 1; font-size: 15px; color: rgba(255,255,255,0.9); }
+  .row .coef { font-size: 12px; color: #00d2ff; background: rgba(0, 210, 255, 0.1); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(0, 210, 255, 0.2); }
+  .row input { width: 110px; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; text-align: center; font-size: 16px; outline: none; background: rgba(0,0,0,0.2); color: #fff; transition: 0.3s; }
   .row input:focus { border-color: #00d2ff; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); background: rgba(0,0,0,0.4); }
   button { width: 100%; padding: 15px; background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%); color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 25px; transition: 0.3s; box-shadow: 0 5px 15px rgba(0, 210, 255, 0.4); }
   button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 210, 255, 0.6); }
   button:active { transform: translateY(1px); }
   @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   .result { margin-top: 25px; padding: 20px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 16px; display: none; animation: slideUp 0.5s ease forwards; max-height: 500px; overflow-y: auto; }
-  .result .item { margin: 10px 0; font-size: 15px; text-align: center; }
+  .result .item { margin: 12px 0; font-size: 16px; text-align: center; }
   .result .big { font-size: 36px; font-weight: bold; color: #00d2ff; text-shadow: 0 0 20px rgba(0,210,255,0.5); }
   .result .rank { font-size: 28px; font-weight: bold; color: #ff416c; text-shadow: 0 0 20px rgba(255,65,108,0.5); }
   .unis { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
   .unis h3 { font-size: 14px; color: #fff; margin-bottom: 10px; text-align: center; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 8px; }
-  .uni-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; margin: 8px 0; border-radius: 10px; font-size: 13px; background: rgba(255,255,255,0.05); border-right: 4px solid transparent; transition: 0.2s; }
+  .uni-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; margin: 10px 0; border-radius: 10px; font-size: 14px; background: rgba(255,255,255,0.05); border-right: 4px solid transparent; transition: 0.2s; }
   .uni-item:hover { background: rgba(255,255,255,0.1); }
   .uni-yes { border-right-color: #2ecc71; }
-  .uni-yes .name { color: #a3e4d7; }
+  .uni-yes .name { color: #a3e4d7; text-align: center; flex: 1; }
   .uni-maybe { border-right-color: #f1c40f; }
-  .uni-maybe .name { color: #f9e79f; }
+  .uni-maybe .name { color: #f9e79f; text-align: center; flex: 1; }
   .uni-item .name { font-weight: bold; }
-  .uni-item .last { font-size: 11px; opacity: 0.8; }
+  .uni-item .last { font-size: 12px; opacity: 0.8; white-space: nowrap; }
   .uni-type { font-size: 10px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 5px; margin-right: 5px; color: #fff; }
   .major-separator { margin-top: 25px; margin-bottom: 10px; border-bottom: 2px dashed rgba(0, 210, 255, 0.4); padding-bottom: 5px; text-align: center; font-weight: bold; color: #00d2ff; font-size: 16px; }
   .channel { text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.2); font-size: 13px; }
   .channel a { color: #00d2ff; text-decoration: none; font-weight: bold; text-shadow: 0 0 10px rgba(0,210,255,0.5); }
   .ai-answer-box { background: linear-gradient(135deg, rgba(0, 210, 255, 0.15), rgba(58, 123, 213, 0.15)); border: 1px solid #00d2ff; border-radius: 12px; padding: 15px; margin-bottom: 20px; line-height: 2; font-size: 14px; white-space: pre-wrap; box-shadow: 0 0 15px rgba(0,210,255,0.2); }
   
-  .combined-form { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-  .section-title { font-size: 14px; color: #00d2ff; margin-bottom: 10px; border-bottom: 1px solid rgba(0,210,255,0.3); padding-bottom: 5px; display: flex; justify-content: space-between; }
-  .grade-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-  .grade-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 6px 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
-  .grade-item label { font-size: 11px; }
-  .grade-item input { width: 45px; padding: 4px; text-align: center; border-radius: 5px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; font-size: 13px; }
+  .combined-form { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+  .section-title { font-size: 15px; color: #00d2ff; margin-bottom: 12px; border-bottom: 1px solid rgba(0,210,255,0.3); padding-bottom: 8px; display: flex; justify-content: space-between; }
+  .grade-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+  .grade-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+  .grade-item label { font-size: 13px; }
+  .grade-item input { width: 55px; padding: 8px; text-align: center; border-radius: 5px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; font-size: 14px; }
   .hint { font-size: 11px; color: #f1c40f; margin-top: 5px; text-align: center; display: block; }
   
-  /* استایل جدید برای فیلد ورود مستقیم */
   .direct-input-box { background: rgba(0,0,0,0.3); border: 1px dashed rgba(0,210,255,0.4); border-radius: 12px; padding: 15px; margin-bottom: 15px; text-align: center; }
   .direct-input-box label { display: block; font-size: 13px; color: #00d2ff; margin-bottom: 8px; font-weight: bold; }
   .tab-container { display: flex; gap: 5px; margin-bottom: 10px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 8px; }
-  .tab-btn { flex: 1; padding: 8px; border-radius: 6px; border: none; background: transparent; color: rgba(255,255,255,0.6); cursor: pointer; font-size: 13px; font-weight: bold; transition: 0.3s; margin-top: 0; width: auto; box-shadow: none; }
+  .tab-btn { flex: 1; padding: 10px; border-radius: 6px; border: none; background: transparent; color: rgba(255,255,255,0.6); cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.3s; margin-top: 0; width: auto; box-shadow: none; }
   .tab-btn.active { background: #00d2ff; color: #0f2027; box-shadow: 0 2px 8px rgba(0,210,255,0.3); }
-  .direct-input-box input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; text-align: center; font-size: 14px; outline: none; margin-bottom: 10px; }
+  .direct-input-box input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; text-align: center; font-size: 16px; outline: none; margin-bottom: 10px; }
   .direct-input-box input:focus { border-color: #00d2ff; }
   
-  /* دکمه دریافت کارت عکس */
   .btn-image { background: linear-gradient(90deg, #2ecc71 0%, #27ae60 100%) !important; box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4) !important; margin-top: 15px !important; }
   .btn-image:hover { box-shadow: 0 8px 25px rgba(46, 204, 113, 0.6) !important; }
 
-  /* مودال نمایش عکس */
   .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
   .modal.show { display: flex; }
   .modal-content { background: #1e3c72; border-radius: 16px; padding: 20px; max-width: 500px; width: 100%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
@@ -76,7 +73,6 @@
   .modal-content .share-btn-tg { background: #0088cc; color: #fff; padding: 12px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .modal-content .share-btn-tg:hover { background: #006699; }
   
-  /* مخفی کردن دکمه‌های اشتراک‌گذاری قبلی */
   .share-container { display: none !important; }
 </style>
 </head>
@@ -122,7 +118,6 @@
   </div>
 
   <div class="combined-form">
-    <!-- فیلد ورود مستقیم رتبه یا تراز -->
     <div class="direct-input-box">
       <label>🔢 محاسبه سریع با ورود مستقیم رتبه یا تراز کل</label>
       
@@ -144,7 +139,7 @@
     <div class="row"><label>ریاضی</label><span class="coef">۷</span><input id="d4" type="number" placeholder="%"></div>
 
     <div class="section-title" style="margin-top: 20px;">📝 سابقه تحصیلی (۶۰٪)</div>
-    <p style="font-size:11px; color:#aaa; margin-bottom:10px;">نمرات نهایی (از ۲۰) را وارد کنید تا تراز سابقه محاسبه شود. برای دقت بالا، اگر تراز سابقه دارید، در فیلد پایین وارد کنید.</p>
+    <p style="font-size:12px; color:#aaa; margin-bottom:10px;">نمرات نهایی (از ۲۰) را وارد کنید تا تراز سابقه محاسبه شود. برای دقت بالا، اگر تراز سابقه دارید، در فیلد پایین وارد کنید.</p>
     
     <div class="grade-grid">
       <div class="grade-item"><label>زیست (۱۰.۶۶)</label><input id="g_biology" type="number" step="0.25" placeholder="20"></div>
@@ -160,8 +155,8 @@
     </div>
     
     <div style="margin-top:15px; border-top: 1px dashed rgba(255,255,255,0.2); padding-top:15px;">
-      <label style="font-size:12px; display:block; margin-bottom:5px; color:#f1c40f;">یا تراز سابقه تحصیلی خود را مستقیم وارد کنید:</label>
-      <input id="school_taraz_direct" type="number" placeholder="مثلا 8464" style="width:100%; padding:10px; border-radius:12px; border:1px solid rgba(241, 196, 15, 0.5); background:rgba(0,0,0,0.3); color:#fff; text-align:center;">
+      <label style="font-size:13px; display:block; margin-bottom:5px; color:#f1c40f;">یا تراز سابقه تحصیلی خود را مستقیم وارد کنید:</label>
+      <input id="school_taraz_direct" type="number" placeholder="مثلا 8464" style="width:100%; padding:12px; border-radius:12px; border:1px solid rgba(241, 196, 15, 0.5); background:rgba(0,0,0,0.3); color:#fff; text-align:center; font-size:16px;">
       <span class="hint">⚠️ اگر این فیلد را پر کنید، نمرات بالا نادیده گرفته می‌شوند.</span>
     </div>
 
@@ -173,7 +168,7 @@
     <div id="calcResultsContainer">
       <div class="item">تراز نهایی (کل): <span class="big" id="outTaraz">0</span></div>
       <div class="item">رتبه تقریبی: <span class="rank" id="outRank">-</span></div>
-      <div id="calcBreakdown" style="font-size:12px; text-align:center; color:#aaa; margin-top:10px; display:none;"></div>
+      <div id="calcBreakdown" style="font-size:13px; text-align:center; color:#aaa; margin-top:10px; display:none;"></div>
       
       <button class="btn-image" id="btnImage" onclick="generateImage()" style="display:none;">📸 دریافت کارت نتیجه (عکس)</button>
 
@@ -184,7 +179,6 @@
   <div class="channel">📢 <a href="https://t.me/Hokm_Akhar" target="_blank">@Hokm_Akhar حکم آخر</a></div>
 </div>
 
-<!-- مودال نمایش عکس -->
 <div class="modal" id="imageModal">
   <div class="modal-content">
     <h3 style="color:#fff; margin-bottom:10px;">📸 کارت نتیجه شما</h3>
@@ -196,15 +190,12 @@
   </div>
 </div>
 
-<div class="toast" id="toast">✅ متن کپی شد!</div>
-
 <script>
   if (window.location.hostname !== 'anonymous8430.github.io') {
     document.body.innerHTML = "<div style='text-align:center; padding:50px; font-family:Tahoma; background:#fff; height:100vh; color:#000;'><h1>⚠️ دسترسی غیرمجاز</h1><p>این برنامه فقط از طریق ربات تلگرام حکم یاب قابل استفاده است.</p><a href='https://t.me/HokmYabBot' style='color:blue;'>ورود به ربات تلگرام</a></div>";
     throw new Error("Unauthorized domain");
   }
 </script>
-
 <script>
 // ==========================================
 // === داده‌های کامل رشته‌ها (unisData) ===
@@ -1243,7 +1234,8 @@ var unisData = {
 var majorNames = {
   medicine: 'پزشکی', dental: 'دندان‌پزشکی', pharmacy: 'داروسازی', phd_continuous: 'دکترای پیوسته', vet: 'دامپزشکی', physio: 'فیزیوتراپی', optometry: 'بینایی‌سنجی', audiology: 'شنوایی‌شناسی', prosthetics: 'ساخت پروتزهای دندانی', orthotics: 'ارتوز و پروتز', occupational_therapy: 'کاردرمانی', nutrition: 'علوم تغذیه', radiology: 'تکنولوژی پرتوشناسی', midwifery: 'مامایی', nursing: 'پرستاری'
 };
-
+  </script>
+  <script>
 var tarazRankTable = {
   "1": [
     [11021, 56], [10705, 158], [10415, 315], [10250, 468], [10193, 500],
@@ -1680,37 +1672,30 @@ function generateImage() {
     }
   });
 
-  // نوشتن لیست
-  ctx.font = '16px Tahoma';
-  ctx.textAlign = 'right';
+  // نوشتن لیست (وسط‌چین شده و بدون متن اضافی)
+  ctx.font = '15px Tahoma';
+  ctx.textAlign = 'center';
   var y = 560;
   if (selectedUnis.length === 0) {
     ctx.fillStyle = 'rgba(255,255,255,0.6)';
-    ctx.fillText('با این رتبه، هیچ دانشگاهی پیدا نشد.', width - 100, y);
+    ctx.fillText('با این رتبه، هیچ دانشگاهی پیدا نشد.', width / 2, y);
   } else {
     selectedUnis.forEach(function(item, index) {
       if (y > height - 120) return;
       ctx.fillStyle = index % 2 === 0 ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.1)';
-      ctx.fillRect(60, y - 20, width - 120, 35);
+      ctx.fillRect(60, y - 20, width - 120, 40);
       
-      // نام دانشگاه
+      // نام دانشگاه دقیقاً وسط
       ctx.fillStyle = '#a3e4d7';
       ctx.font = 'bold 15px Tahoma';
-      ctx.fillText((index + 1) + '. ' + item.name, width - 200, y + 5);
+      ctx.fillText((index + 1) + '. ' + item.name, width / 2, y + 5);
       
-      // رتبه در سمت چپ کادر
-      ctx.fillStyle = '#ff416c';
-      ctx.font = 'bold 14px Tahoma';
-      ctx.textAlign = 'left';
-      ctx.fillText('آخرین: ' + item.rank.toLocaleString('fa-IR'), 80, y + 5);
-      ctx.textAlign = 'right';
+      // رشته دقیقاً زیر نام دانشگاه و وسط
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.font = '13px Tahoma';
+      ctx.fillText('(' + item.major + ')', width / 2, y + 25);
       
-      // رشته زیر اسم
-      ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.font = '12px Tahoma';
-      ctx.fillText('(' + item.major + ')', width - 90, y + 22);
-      
-      y += 40;
+      y += 45;
     });
   }
 
@@ -1726,37 +1711,46 @@ function generateImage() {
   document.getElementById('imageModal').classList.add('show');
 }
 
-function shareImageToTelegram() {
-  var imgSrc = document.getElementById('resultImage').src;
-  var regText = lastResult.region === '1' ? 'منطقه ۱' : (lastResult.region === '2' ? 'منطقه ۲' : 'منطقه ۳');
-  var text = "رتبه تقریبی من با ماشین‌حساب حکم آخر:\n" +
-             "🔹 تراز: " + lastResult.taraz.toLocaleString('fa-IR') + "\n" +
-             "🔹 رتبه تقریبی: " + lastResult.rank + " (" + regText + ")\n" +
-             "تو هم با همین لینک رتبه‌ت رو تخمین بزن و ببین کدوم دانشگاه‌ها رو می‌تونی بزنی 👇\n" +
-             "https://t.me/Hokm_Akhar";
-  
-  if (navigator.share) {
-    fetch(imgSrc)
-      .then(res => res.blob())
-      .then(blob => {
-        var file = new File([blob], 'hokm-akhar-result.png', { type: 'image/png' });
-        navigator.share({
-          title: 'کارت نتیجه حکم آخر',
-          text: text,
-          files: [file]
-        }).catch(err => {
-          navigator.share({ title: 'کارت نتیجه حکم آخر', text: text }).catch(() => {
-            window.open("https://t.me/share/url?url=" + encodeURIComponent("https://t.me/Hokm_Akhar") + "&text=" + encodeURIComponent(text), '_blank');
-          });
-        });
-      })
-      .catch(() => {
-        navigator.share({ title: 'کارت نتیجه حکم آخر', text: text }).catch(() => {
-          window.open("https://t.me/share/url?url=" + encodeURIComponent("https://t.me/Hokm_Akhar") + "&text=" + encodeURIComponent(text), '_blank');
-        });
+async function shareImageToTelegram() {
+  const imgElement = document.getElementById('resultImage');
+  if (!imgElement || !imgElement.src) {
+    alert('عکسی برای اشتراک‌گذاری وجود ندارد!');
+    return;
+  }
+
+  try {
+    const response = await fetch(imgElement.src);
+    const blob = await response.blob();
+    const file = new File([blob], 'hokm-result.png', { type: 'image/png' });
+
+    // اگر Web Share API از فایل پشتیبانی می‌کند (اکثر مرورگرها)
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: 'کارت نتیجه حکم آخر',
+        text: 'نتیجه من در حکم یاب - @Hokm_Akhar'
       });
-  } else {
-    window.open("https://t.me/share/url?url=" + encodeURIComponent("https://t.me/Hokm_Akhar") + "&text=" + encodeURIComponent(text), '_blank');
+      return;
+    }
+
+    // اگر وب‌ویو تلگرام اجازه نداد: دانلود خودکار عکس
+    const link = document.createElement('a');
+    link.href = imgElement.src;
+    link.download = 'hokm-result.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // نمایش پیام و باز کردن تلگرام
+    alert('✅ عکس کارت نتیجه در گالری ذخیره شد.\nحالا می‌توانید آن را در تلگرام ارسال کنید.');
+    
+    setTimeout(() => {
+      window.open('https://t.me/share/url?url=' + encodeURIComponent('https://t.me/Hokm_Akhar') + '&text=' + encodeURIComponent('کارت نتیجه من از حکم یاب'), '_blank');
+    }, 1000);
+
+  } catch (err) {
+    console.error('خطا در اشتراک‌گذاری:', err);
+    alert('خطا در اشتراک‌گذاری. لطفاً عکس را به صورت دستی ذخیره کنید.');
   }
 }
 
@@ -1879,4 +1873,4 @@ function renderChannelResults(posts, query) {
 }
 </script>
 </body>
-                                 </html>
+</html>
