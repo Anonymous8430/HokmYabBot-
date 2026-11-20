@@ -1672,7 +1672,7 @@ function generateImage() {
     }
   });
 
-  // نوشتن لیست (اسم رشته دقیقا قبل از اسم دانشگاه، بولد و رنگی)
+  // نوشتن لیست (رشته سمت راست، دانشگاه سمت چپ)
   ctx.font = '15px Tahoma';
   ctx.textAlign = 'center';
   var y = 560;
@@ -1682,26 +1682,24 @@ function generateImage() {
   } else {
     selectedUnis.forEach(function(item, index) {
       if (y > height - 120) return;
+      
+      // پس‌زمینه ردیف
       ctx.fillStyle = index % 2 === 0 ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.1)';
       ctx.fillRect(60, y - 20, width - 120, 42);
       
-      // اسم رشته دقیقا قبل از اسم دانشگاه (با رنگ زرد و بولد)
-      ctx.textAlign = 'right';
-      var uniName = (index + 1) + '. ' + item.name;
+      // ۱. نوشتن اسم دانشگاه (رنگ فیروزه‌ای، سمت چپ)
+      var uniText = (index + 1) + '. ' + item.name;
       ctx.font = 'bold 15px Tahoma';
-      ctx.fillStyle = '#a3e4d7'; // رنگ فیروزه‌ای برای دانشگاه
-      ctx.fillText(uniName, width - 80, y + 10);
-
-      // حالا رشته رو مینویسیم سمت چپش با رنگ زرد
-      ctx.font = 'bold 14px Tahoma';
-      ctx.fillStyle = '#f1c40f'; // رنگ زرد برای رشته
-      ctx.textAlign = 'right';
-      // محاسبه عرض متن دانشگاه برای قرار دادن رشته دقیقا قبل از اون
-      var textWidth = ctx.measureText(uniName).width;
-      ctx.fillText(' (' + item.major + ')', width - 80 - textWidth, y + 10);
-
-      ctx.textAlign = 'center'; // برگرداندن به حالت وسط برای بقیه
+      ctx.fillStyle = '#a3e4d7';
+      ctx.textAlign = 'left';
+      ctx.fillText(uniText, 80, y + 10);
       
+      // ۲. نوشتن اسم رشته (زرد رنگ، بلد، سمت راست)
+      ctx.font = 'bold 16px Tahoma';
+      ctx.fillStyle = '#f1c40f'; // زرد
+      ctx.textAlign = 'right';
+      ctx.fillText('(' + item.major + ')', width - 80, y + 10);
+
       y += 48;
     });
   }
@@ -1716,9 +1714,30 @@ function generateImage() {
   var imgData = canvas.toDataURL('image/png');
   document.getElementById('resultImage').src = imgData;
   document.getElementById('imageModal').classList.add('show');
-
-  // === دستور به کاربر برای ذخیره عکس ===
-  alert('📸 عکس کارت نتیجه آماده شد.\n\n⚠️ برای ذخیره در گالری: انگشت خود را روی عکس نگه دارید و گزینه "ذخیره تصویر" (Save Image) را انتخاب کنید.\n\nدر وب‌ویو تلگرام، دانلود خودکار کار نمی‌کند و تنها راه نگه داشتن عکس است.');
+  
+  // === اضافه کردن دکمه دانلود با استایل واضح ===
+  var modalContent = document.querySelector('.modal-content');
+  if(modalContent) {
+      // پاک کردن دکمه قبلی
+      var oldBtn = document.getElementById('btnDownloadManual');
+      if (oldBtn) oldBtn.remove();
+      
+      // ساخت دکمه جدید (لینک دانلود)
+      var downloadBtn = document.createElement('a');
+      downloadBtn.id = 'btnDownloadManual';
+      downloadBtn.href = imgData;
+      downloadBtn.download = 'hokm-result.png';
+      downloadBtn.innerHTML = '📥 ذخیره عکس در گالری (لمس کنید)';
+      downloadBtn.style.cssText = 'display:block; margin-top:10px; padding:12px; background:#2ecc71; color:#fff; text-decoration:none; border-radius:8px; font-size:16px; font-weight:bold; text-align:center; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);';
+      
+      // قرار دادن دکمه دقیقا قبل از دکمه اشتراک‌گذاری تلگرام
+      var tgBtn = modalContent.querySelector('.share-btn-tg');
+      if (tgBtn) {
+        modalContent.insertBefore(downloadBtn, tgBtn);
+      } else {
+        modalContent.appendChild(downloadBtn);
+      }
+  }
 }
 
 async function shareImageToTelegram() {
@@ -1873,4 +1892,4 @@ function renderChannelResults(posts, query) {
 }
 </script>
 </body>
-  </html>
+</html>
