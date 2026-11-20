@@ -62,6 +62,24 @@
   .share-copy:hover { background: rgba(255,255,255,0.25); transform: translateY(-2px); }
   .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #2ecc71; color: #fff; padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s; z-index: 999; pointer-events: none; }
   .toast.show { opacity: 1; }
+
+  /* استایل جدید برای فیلد ورود مستقیم */
+  .direct-input-box { background: rgba(0,0,0,0.3); border: 1px dashed rgba(0,210,255,0.4); border-radius: 12px; padding: 15px; margin-bottom: 15px; text-align: center; }
+  .direct-input-box label { display: block; font-size: 13px; color: #00d2ff; margin-bottom: 8px; font-weight: bold; }
+  .direct-input-box select, .direct-input-box input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; text-align: center; font-size: 14px; outline: none; margin-bottom: 10px; }
+  .direct-input-box input:focus, .direct-input-box select:focus { border-color: #00d2ff; }
+  
+  /* دکمه دریافت کارت عکس */
+  .btn-image { background: linear-gradient(90deg, #2ecc71 0%, #27ae60 100%) !important; box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4) !important; margin-top: 15px !important; }
+  .btn-image:hover { box-shadow: 0 8px 25px rgba(46, 204, 113, 0.6) !important; }
+
+  /* مودال نمایش عکس */
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+  .modal.show { display: flex; }
+  .modal-content { background: #1e3c72; border-radius: 16px; padding: 20px; max-width: 500px; width: 100%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  .modal-content img { width: 100%; border-radius: 12px; margin-bottom: 15px; }
+  .modal-content .close-btn { background: #ff416c; color: #fff; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: bold; margin-top: 10px; }
+  .modal-content .download-btn { background: #2ecc71; color: #fff; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: bold; margin-top: 10px; margin-left: 10px; }
 </style>
 </head>
 <body>
@@ -106,6 +124,19 @@
   </div>
 
   <div class="combined-form">
+    <!-- فیلد ورود مستقیم رتبه یا تراز -->
+    <div class="direct-input-box">
+      <label>🔢 محاسبه سریع با ورود مستقیم رتبه یا تراز کل</label>
+      <select id="directType">
+        <option value="taraz">ورود تراز کل</option>
+        <option value="rank">ورود رتبه</option>
+      </select>
+      <input id="directValue" type="number" placeholder="مثلا 8500 (تراز) یا 1500 (رتبه)">
+      <button onclick="calcDirect()" style="margin-top:5px; padding:12px; background:#00d2ff; color:#000;">محاسبه سریع</button>
+    </div>
+    
+    <div style="text-align:center; color:#aaa; font-size:12px; margin:15px 0;">— یا —</div>
+
     <div class="section-title">📊 درصدهای کنکور اختصاصی (۴۰٪)</div>
     <div class="row"><label>زیست‌شناسی</label><span class="coef">۱۲</span><input id="d1" type="number" placeholder="%"></div>
     <div class="row"><label>فیزیک</label><span class="coef">۷</span><input id="d2" type="number" placeholder="%"></div>
@@ -149,11 +180,25 @@
         <button class="share-btn share-copy" onclick="copyShareText()">📋 کپی متن</button>
       </div>
 
+      <button class="btn-image" id="btnImage" onclick="generateImage()" style="display:none;">📸 دریافت کارت نتیجه (عکس)</button>
+
       <div class="unis" id="uniResults"></div>
     </div>
   </div>
 
   <div class="channel">📢 <a href="https://t.me/Hokm_Akhar" target="_blank">@Hokm_Akhar حکم آخر</a></div>
+</div>
+
+<!-- مودال نمایش عکس -->
+<div class="modal" id="imageModal">
+  <div class="modal-content">
+    <h3 style="color:#fff; margin-bottom:10px;">📸 کارت نتیجه شما</h3>
+    <img id="resultImage" src="" alt="کارت نتیجه">
+    <div>
+      <button class="download-btn" onclick="downloadImage()">⬇️ دانلود</button>
+      <button class="close-btn" onclick="closeModal()">بستن</button>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast">✅ متن کپی شد!</div>
@@ -165,7 +210,13 @@
   }
 </script>
 
+<!-- داده‌ها -->
+<script src="data:application/javascript;base64," id="dummy"></script>
+
 <script>
+// ==========================================
+// === داده‌های کامل رشته‌ها (unisData) ===
+// ==========================================
 var unisData = {
   medicine: [
     {name: 'علوم پزشکی تهران - نیمسال اول', r1: 52, r2: 70, r3: 143},
@@ -1316,6 +1367,7 @@ function clearResults() {
   document.getElementById('searchInput').value = '';
   document.getElementById('searchResultsContainer').innerHTML = '';
   document.getElementById('shareContainer').style.display = 'none';
+  document.getElementById('btnImage').style.display = 'none';
 }
 
 function calcCombined() {
@@ -1416,6 +1468,51 @@ function calcCombined() {
   showResult(finalTaraz, rank, region, breakdown);
 }
 
+// تابع جدید برای محاسبه با ورود مستقیم رتبه یا تراز
+function calcDirect() {
+  var type = document.getElementById('directType').value;
+  var val = parseFloat(document.getElementById('directValue').value);
+  var region = document.getElementById('regionSelect').value;
+  
+  if (isNaN(val) || val <= 0) {
+    alert('لطفاً یک مقدار معتبر وارد کنید.');
+    return;
+  }
+
+  var rank, finalTaraz;
+  
+  if (type === 'taraz') {
+    finalTaraz = val;
+    rank = getRankFromTaraz(finalTaraz, region);
+  } else {
+    rank = val;
+    finalTaraz = getTarazFromRank(rank, region);
+  }
+  
+  if (rank === null) {
+    alert('با این مقدار، رتبه/تراز قابل محاسبه نیست.');
+    return;
+  }
+  
+  showResult(finalTaraz, rank, region, 'محاسبه مستقیم از ' + (type === 'taraz' ? 'تراز کل' : 'رتبه') + ': ' + val.toLocaleString('fa-IR'));
+}
+
+// تابع معکوس برای پیدا کردن تراز از روی رتبه
+function getTarazFromRank(rank, region) {
+  var table = tarazRankTable[region];
+  if (rank <= table[0][1]) return table[0][0];
+  if (rank >= table[table.length-1][1]) return table[table.length-1][0];
+  
+  for (var i = 0; i < table.length - 1; i++) {
+    var hi = table[i], lo = table[i+1];
+    if (rank >= hi[1] && rank <= lo[1]) {
+      var ratio = (rank - hi[1]) / (lo[1] - hi[1]);
+      return hi[0] + ratio * (lo[0] - hi[0]);
+    }
+  }
+  return null;
+}
+
 function getRankFromTaraz(taraz, region) {
   var table = tarazRankTable[region];
   if(taraz >= table[0][0]) { var ratioTop = (taraz - table[0][0]) / (table[0][0] - table[1][0]); var estimatedRank = table[0][1] - (ratioTop * (table[1][1] - table[0][1])); return Math.max(1, Math.round(estimatedRank)); }
@@ -1439,8 +1536,10 @@ function showResult(taraz, rank, region, breakdown) {
 
   if (rank) {
     document.getElementById('shareContainer').style.display = 'flex';
+    document.getElementById('btnImage').style.display = 'block';
   } else {
     document.getElementById('shareContainer').style.display = 'none';
+    document.getElementById('btnImage').style.display = 'none';
   }
   
   var breakdownDiv = document.getElementById('calcBreakdown');
@@ -1495,6 +1594,139 @@ function showResult(taraz, rank, region, breakdown) {
   document.getElementById('res').style.display = 'block';
 }
 
+// ==========================================
+// === تولید عکس با Canvas ===
+// ==========================================
+function generateImage() {
+  var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+  var width = 800;
+  var height = 1000;
+  canvas.width = width;
+  canvas.height = height;
+
+  // پس‌زمینه
+  var gradient = ctx.createLinearGradient(0, 0, width, height);
+  gradient.addColorStop(0, '#0f2027');
+  gradient.addColorStop(0.5, '#203a43');
+  gradient.addColorStop(1, '#2c5364');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, height);
+
+  // عنوان بالا
+  ctx.fillStyle = '#00d2ff';
+  ctx.font = 'bold 36px Tahoma';
+  ctx.textAlign = 'center';
+  ctx.fillText('🧮 حکم آخر', width / 2, 60);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.font = '20px Tahoma';
+  ctx.fillText('کارت نتیجه تخمین رتبه کنکور ۴۰۴', width / 2, 100);
+
+  // خط جداکننده
+  ctx.strokeStyle = '#00d2ff';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(100, 130);
+  ctx.lineTo(width - 100, 130);
+  ctx.stroke();
+
+  // تراز
+  ctx.fillStyle = '#00d2ff';
+  ctx.font = 'bold 26px Tahoma';
+  ctx.fillText('تراز کل', width / 2, 200);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 64px Tahoma';
+  ctx.fillText(lastResult.taraz.toLocaleString('fa-IR'), width / 2, 270);
+
+  // رتبه
+  ctx.fillStyle = '#ff416c';
+  ctx.font = 'bold 26px Tahoma';
+  ctx.fillText('رتبه تقریبی', width / 2, 350);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 64px Tahoma';
+  var regText = lastResult.region === '1' ? 'منطقه ۱' : (lastResult.region === '2' ? 'منطقه ۲' : 'منطقه ۳');
+  ctx.fillText(lastResult.rank.toLocaleString('fa-IR') + ' (' + regText + ')', width / 2, 420);
+
+  // خط جداکننده
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+  ctx.beginPath();
+  ctx.moveTo(100, 460);
+  ctx.lineTo(width - 100, 460);
+  ctx.stroke();
+
+  // عنوان دانشگاه‌ها
+  ctx.fillStyle = '#00d2ff';
+  ctx.font = 'bold 24px Tahoma';
+  ctx.fillText('🏆 ۱۰ دانشگاه شاخص قابل قبولی', width / 2, 510);
+
+  // پیدا کردن ۱۰ دانشگاه شاخص از همه رشته‌ها
+  var regionKey = 'r' + lastResult.region;
+  var allMatches = [];
+  Object.keys(unisData).forEach(function(major) {
+    unisData[major].forEach(function(uni) {
+      if (uni[regionKey] !== null && uni[regionKey] >= lastResult.rank) {
+        allMatches.push({ major: majorNames[major], name: uni.name, rank: uni[regionKey] });
+      }
+    });
+  });
+
+  // مرتب‌سازی بر اساس رتبه (بهترین‌ها اول)
+  allMatches.sort(function(a, b) { return a.rank - b.rank; });
+  var top10 = allMatches.slice(0, 10);
+
+  // نوشتن لیست
+  ctx.font = '18px Tahoma';
+  ctx.textAlign = 'right';
+  var y = 560;
+  if (top10.length === 0) {
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fillText('با این رتبه، هیچ دانشگاهی پیدا نشد.', width - 100, y);
+  } else {
+    top10.forEach(function(item, index) {
+      if (y > height - 120) return;
+      ctx.fillStyle = index % 2 === 0 ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.1)';
+      ctx.fillRect(60, y - 20, width - 120, 35);
+      
+      ctx.fillStyle = '#a3e4d7';
+      ctx.font = 'bold 16px Tahoma';
+      ctx.fillText((index + 1) + '. ' + item.name, width - 90, y + 5);
+      
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.font = '12px Tahoma';
+      ctx.fillText('(' + item.major + ') - آخرین رتبه: ' + item.rank.toLocaleString('fa-IR'), width - 90, y + 22);
+      
+      y += 40;
+    });
+  }
+
+  // پایین صفحه
+  ctx.fillStyle = '#00d2ff';
+  ctx.font = 'bold 20px Tahoma';
+  ctx.textAlign = 'center';
+  ctx.fillText('@Hokm_Akhar | کانال حکم آخر', width / 2, height - 40);
+
+  // نمایش در مودال
+  var imgData = canvas.toDataURL('image/png');
+  document.getElementById('resultImage').src = imgData;
+  document.getElementById('imageModal').classList.add('show');
+  document.getElementById('resultImage').dataset.download = 'hokm-akhar-result.png';
+}
+
+function closeModal() {
+  document.getElementById('imageModal').classList.remove('show');
+}
+
+function downloadImage() {
+  var link = document.createElement('a');
+  link.download = 'hokm-akhar-result.png';
+  link.href = document.getElementById('resultImage').src;
+  link.click();
+}
+
+// ==========================================
+// === اشتراک‌گذاری ===
+// ==========================================
 function getShareText() {
   var regText = lastResult.region === '1' ? 'منطقه ۱' : (lastResult.region === '2' ? 'منطقه ۲' : 'منطقه ۳');
   return "رتبه تقریبی من با ماشین‌حساب حکم آخر:\n" +
@@ -1548,6 +1780,9 @@ function showToast() {
   }, 2500);
 }
 
+// ==========================================
+// === جستجوی کانال (مشاور هوشمند) ===
+// ==========================================
 async function searchChannel() {
   var input = document.getElementById("channelSearch");
   var status = document.getElementById("channelStatus");
@@ -1663,4 +1898,4 @@ function renderChannelResults(posts, query) {
 }
 </script>
 </body>
-  </html>
+      </html>
