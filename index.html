@@ -1672,7 +1672,7 @@ function generateImage() {
     }
   });
 
-  // نوشتن لیست (وسط‌چین شده و بدون متن اضافی)
+  // نوشتن لیست (رشته بالای دانشگاه)
   ctx.font = '15px Tahoma';
   ctx.textAlign = 'center';
   var y = 560;
@@ -1683,19 +1683,19 @@ function generateImage() {
     selectedUnis.forEach(function(item, index) {
       if (y > height - 120) return;
       ctx.fillStyle = index % 2 === 0 ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.1)';
-      ctx.fillRect(60, y - 20, width - 120, 40);
+      ctx.fillRect(60, y - 20, width - 120, 42); // ارتفاع کادر کمی بیشتر
       
-      // نام دانشگاه دقیقاً وسط
+      // رشته بالای دانشگاه و وسط
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.font = '13px Tahoma';
+      ctx.fillText('(' + item.major + ')', width / 2, y - 2);
+      
+      // نام دانشگاه وسط
       ctx.fillStyle = '#a3e4d7';
       ctx.font = 'bold 15px Tahoma';
-      ctx.fillText((index + 1) + '. ' + item.name, width / 2, y + 5);
+      ctx.fillText((index + 1) + '. ' + item.name, width / 2, y + 18);
       
-      // رشته دقیقاً زیر نام دانشگاه و وسط
-      ctx.fillStyle = 'rgba(255,255,255,0.7)';
-      ctx.font = '13px Tahoma';
-      ctx.fillText('(' + item.major + ')', width / 2, y + 25);
-      
-      y += 45;
+      y += 48;
     });
   }
 
@@ -1708,6 +1708,23 @@ function generateImage() {
   // نمایش در مودال
   var imgData = canvas.toDataURL('image/png');
   document.getElementById('resultImage').src = imgData;
+  
+  // === تغییر مهم برای ذخیره در گالری ===
+  // تبدیل عکس به لینک دانلود برای ذخیره دستی
+  var downloadBtn = document.createElement('a');
+  downloadBtn.href = imgData;
+  downloadBtn.download = 'hokm-akhar-result.png';
+  downloadBtn.innerHTML = '📥 ذخیره در گالری (برای ذخیره، لمس کنید)';
+  downloadBtn.style.cssText = 'display:block; margin-top:10px; padding:10px; background:#2ecc71; color:#fff; text-decoration:none; border-radius:8px; font-size:14px; font-weight:bold; text-align:center;';
+  
+  // اضافه کردن دکمه دانلود به مودال
+  var modalContent = document.querySelector('.modal-content');
+  var oldDownloadBtn = modalContent.querySelector('.download-btn');
+  if (oldDownloadBtn) oldDownloadBtn.remove();
+  
+  downloadBtn.className = 'download-btn';
+  modalContent.insertBefore(downloadBtn, modalContent.querySelector('.share-btn-tg'));
+  
   document.getElementById('imageModal').classList.add('show');
 }
 
@@ -1733,17 +1750,10 @@ async function shareImageToTelegram() {
       return;
     }
 
-    // اگر وب‌ویو تلگرام اجازه نداد: دانلود خودکار عکس
-    const link = document.createElement('a');
-    link.href = imgElement.src;
-    link.download = 'hokm-result.png';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    // نمایش پیام و باز کردن تلگرام
-    alert('✅ عکس کارت نتیجه در گالری ذخیره شد.\nحالا می‌توانید آن را در تلگرام ارسال کنید.');
+    // اگر وب‌ویو تلگرام اجازه نداد: به کاربر می‌گیم عکس رو با نگه داشتن لمس کنه
+    alert('✅ عکس کارت نتیجه آماده است.\n\nبرای ذخیره در گالری، انگشت خود را روی عکس نگه دارید و گزینه "ذخیره تصویر" یا "Save Image" را انتخاب کنید.\n\nسپس می‌توانید آن را در تلگرام ارسال کنید.');
     
+    // باز کردن تلگرام
     setTimeout(() => {
       window.open('https://t.me/share/url?url=' + encodeURIComponent('https://t.me/Hokm_Akhar') + '&text=' + encodeURIComponent('کارت نتیجه من از حکم یاب'), '_blank');
     }, 1000);
