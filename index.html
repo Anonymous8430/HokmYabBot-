@@ -1428,11 +1428,13 @@ function calcCombined() {
             if(grades[key] > 0) {
               var diff = grades[key] - weightedAvg;
               var weightFactor = coeffs[key] / sumCoeffs;
+              
+              // === اصلاح ضرایب برای نزدیک شدن به تراز واقعی ===
               if (coeffs[key] >= 8) {
-                  if (diff > 0) bonus += (diff * weightFactor * 650);
-                  else bonus += (diff * weightFactor * 200);
+                  if (diff > 0) bonus += (diff * weightFactor * 950); // پاداش بیشتر برای دروس ۲۰
+                  else bonus += (diff * weightFactor * 80); // جریمه خیلی کم برای نمرات پایین دروس مهم
               } else {
-                  if (diff < 0) bonus += (diff * weightFactor * 90); 
+                  if (diff < 0) bonus += (diff * weightFactor * 50); // جریمه خیلی ناچیز برای دروس کم‌ضریب
                   else bonus += (diff * weightFactor * 50);
               }
             }
@@ -1442,7 +1444,8 @@ function calcCombined() {
           if (weightedAvg <= 19.4) {
               baseTaraz = 8742 + (weightedAvg - 18.88) * 1350; 
           } else {
-              baseTaraz = 8742 + (19.4 - 18.88) * 1350 + (weightedAvg - 19.4) * 1000;
+              // شیب تندتر برای رسیدن به تراز بالای ۱۰۰۰۰
+              baseTaraz = 8742 + (19.4 - 18.88) * 1350 + (weightedAvg - 19.4) * 1200;
           }
           schoolTaraz = baseTaraz + bonus;
       }
@@ -1896,4 +1899,4 @@ function renderChannelResults(posts, query) {
 }
 </script>
 </body>
-</html>
+  </html>
