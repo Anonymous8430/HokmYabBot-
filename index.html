@@ -1419,9 +1419,11 @@ function calcCombined() {
     }
     
     if(validCount > 0) {
+      // ۱. اگر همه فیلدها پر شده باشند و همه دقیقا ۲۰ باشند -> سقف تراز
       if (allEnteredValues && allAreTwenty) {
           schoolTaraz = 10728;
       } else {
+          // ۲. محاسبه عادی
           var weightedAvg = sumWeighted / sumCoeffs;
           
           for(var key in grades) {
@@ -1429,12 +1431,12 @@ function calcCombined() {
               var diff = grades[key] - weightedAvg;
               var weightFactor = coeffs[key] / sumCoeffs;
               
-              // اصلاح ضرایب برای رسیدن به تراز واقعی ۱۰۰۷۲
+              // === ضرایب اصلاح‌شده برای نزدیک شدن به تراز واقعی ===
               if (coeffs[key] >= 8) {
-                  if (diff > 0) bonus += (diff * weightFactor * 1200); // پاداش خیلی بیشتر
-                  else bonus += (diff * weightFactor * 10); // جریمه تقریباً صفر
+                  if (diff > 0) bonus += (diff * weightFactor * 500); // پاداش منطقی
+                  else bonus += (diff * weightFactor * 100); // جریمه کم
               } else {
-                  if (diff < 0) bonus += (diff * weightFactor * 10); // جریمه تقریباً صفر
+                  if (diff < 0) bonus += (diff * weightFactor * 50); // جریمه خیلی ناچیز
                   else bonus += (diff * weightFactor * 50);
               }
             }
@@ -1444,12 +1446,13 @@ function calcCombined() {
           if (weightedAvg <= 19.4) {
               baseTaraz = 8742 + (weightedAvg - 18.88) * 1350; 
           } else {
-              // شیب تندتر برای رسیدن به بالای ۱۰۰۰۰
-              baseTaraz = 8742 + (19.4 - 18.88) * 1350 + (weightedAvg - 19.4) * 1500;
+              // شیب منطقی‌تر برای معدل‌های بالا
+              baseTaraz = 8742 + (19.4 - 18.88) * 1350 + (weightedAvg - 19.4) * 1000;
           }
           schoolTaraz = baseTaraz + bonus;
       }
       
+      // کنترل نهایی سقف و کف
       if(schoolTaraz > 10728) schoolTaraz = 10728;
       if(schoolTaraz < 3000) schoolTaraz = 3000;
     }
@@ -1576,6 +1579,7 @@ function showResult(taraz, rank, region, breakdown) {
       else if(diff >= maybeThreshold && diff < yesThreshold) maybeList.push(item);
     }
     
+    // مرتب‌سازی بر اساس بهترین رتبه (کمترین عدد)
     yesList.sort(function(a, b) { return a[regionKey] - b[regionKey]; });
     maybeList.sort(function(a, b) { return a[regionKey] - b[regionKey]; });
     
