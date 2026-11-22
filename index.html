@@ -1419,11 +1419,12 @@ function calcCombined() {
         if(grades[key] > 0) {
           var diff = grades[key] - weightedAvg;
           var weightFactor = coeffs[key] / sumCoeffs;
+          // === ضرایب اصلاح‌شده برای نزدیک شدن به تراز اصلی ===
           if (coeffs[key] >= 8) {
-              if (diff > 0) bonus += (diff * weightFactor * 650);
-              else bonus += (diff * weightFactor * 220);
+              if (diff > 0) bonus += (diff * weightFactor * 700); // پاداش بیشتر
+              else bonus += (diff * weightFactor * 150); // جریمه کمتر
           } else {
-              if (diff < 0) bonus += (diff * weightFactor * 100);
+              if (diff < 0) bonus += (diff * weightFactor * 80); // جریمه کمتر
               else bonus += (diff * weightFactor * 50);
           }
         }
