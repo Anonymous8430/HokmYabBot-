@@ -1419,25 +1419,24 @@ function calcCombined() {
     }
     
     if(validCount > 0) {
+      // ۱. اگر همه نمرات دقیقاً ۲۰ باشند، سقف تراز
       if (allEnteredValues && allAreTwenty) {
           schoolTaraz = 10728;
       } else {
           var weightedAvg = sumWeighted / sumCoeffs;
           
-          // === فرمول کالیبره شده برای نزدیک شدن به تراز واقعی ۹۱۱۷ ===
           for(var key in grades) {
             if(grades[key] > 0) {
               var diff = grades[key] - weightedAvg;
               var weightFactor = coeffs[key] / sumCoeffs;
               
+              // === فرمول نهایی کالیبره‌شده ===
               if (coeffs[key] >= 8) {
-                  // برای دروس مهم: پاداش کمتر، جریمه بیشتر
-                  if (diff > 0) bonus += (diff * weightFactor * 400);
-                  else bonus += (diff * weightFactor * 300); 
+                  if (diff > 0) bonus += (diff * weightFactor * 900); // پاداش زیاد
+                  else bonus += (diff * weightFactor * 50); // جریمه خیلی کم
               } else {
-                  // برای دروس کم‌ضریب: جریمه و پاداش متعادل
-                  if (diff < 0) bonus += (diff * weightFactor * 150);
-                  else bonus += (diff * weightFactor * 100);
+                  if (diff < 0) bonus += (diff * weightFactor * 30); // جریمه ناچیز
+                  else bonus += (diff * weightFactor * 50);
               }
             }
           }
@@ -1446,7 +1445,8 @@ function calcCombined() {
           if (weightedAvg <= 19.4) {
               baseTaraz = 8742 + (weightedAvg - 18.88) * 1350; 
           } else {
-              baseTaraz = 8742 + (19.4 - 18.88) * 1350 + (weightedAvg - 19.4) * 1000;
+              // شیب بسیار تندتر برای معدل‌های بالای ۱۹.۴
+              baseTaraz = 8742 + (19.4 - 18.88) * 1350 + (weightedAvg - 19.4) * 1500;
           }
           schoolTaraz = baseTaraz + bonus;
       }
